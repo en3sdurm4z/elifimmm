@@ -79,7 +79,7 @@
       .row{grid-template-columns:1fr}
     }
 
-    /* ✅ OYUN ALANI: canvas üstte, tuş barı altta (gerçekten ayrı alan) */
+    /* ✅ OYUN ALANI: canvas üstte, tuş barı altta */
     .gameArea{
       position:relative;
       background:#05040a;
@@ -99,7 +99,6 @@
       }
     }
 
-    /* canvas: üst satırı doldurur */
     canvas{
       width:100%;
       height:100%;
@@ -162,7 +161,6 @@
       line-height:1.35;
     }
 
-    /* ✅ Mobil kontrol barı (alt satır) */
     .touchBar{
       grid-row:2;
       display:none;
@@ -199,7 +197,6 @@
     .tbtn:active{transform:translateY(1px); filter:brightness(1.07)}
     .tbtn.main{background:linear-gradient(135deg, #ff4d6d55, #7b2cff55)}
 
-    /* Fullscreen */
     .fs-on{
       width:100vw !important;
       height: calc(var(--vh) * 100) !important;
@@ -277,7 +274,6 @@
 
 <script>
 (() => {
-  // ✅ gerçek ekran yüksekliği fix
   function setVH(){
     document.documentElement.style.setProperty("--vh", (window.innerHeight * 0.01) + "px");
   }
@@ -295,7 +291,6 @@
   const msgEl = document.getElementById("msg");
   const hintEl = document.getElementById("hint");
 
-  // ✅ LOGICAL sahne (oyun fiziği bu ölçekte)
   const LOG_W = 960;
   const LOG_H = 540;
 
@@ -304,7 +299,6 @@
   let OFFX = 0;
   let OFFY = 0;
 
-  // ✅ Letterbox: oyun asla kesilmez, ortalanır
   function fitCanvas(){
     const rect = canvas.getBoundingClientRect();
     const cssW = Math.max(1, Math.floor(rect.width));
@@ -351,7 +345,7 @@
 
   const messages = [
     "Elif’im… 1. bölüm: sadece yürü + kalp + kapı 😄",
-    "2. bölüm: zıplama var ama rahat, tavan sıkmaz 💗",
+    "2. bölüm: zıplama var ama rahat 💗",
     "3. bölüm: asit geldi (yeşil) dikkat 🧸",
     "4. bölüm: asit üstünden atlıyoruz ✨",
     "5. bölüm: B zıplama taşı geldi 😄",
@@ -362,9 +356,7 @@
     "10. bölüm: mini final, geçilir 💗",
   ];
 
-  /* ✅ Kapılar zeminde (altta), platformlar tavana çok yakın değil */
   const LEVELS = [
-    // 1
     [
       "################################",
       "#..............................#",
@@ -385,7 +377,6 @@
       "#..S.......................D...#",
       "################################",
     ],
-    // 2 (platformlar biraz daha aşağı, kapı zeminde)
     [
       "################################",
       "#..............................#",
@@ -406,7 +397,6 @@
       "#..S.......................D...#",
       "################################",
     ],
-    // 3 (asit)
     [
       "################################",
       "#..............................#",
@@ -427,7 +417,6 @@
       "#..S.......................D...#",
       "################################",
     ],
-    // 4
     [
       "################################",
       "#..............................#",
@@ -448,7 +437,6 @@
       "#..S.......................D...#",
       "################################",
     ],
-    // 5 (B)
     [
       "################################",
       "#..............................#",
@@ -469,7 +457,6 @@
       "#..S.......................D...#",
       "################################",
     ],
-    // 6
     [
       "################################",
       "#..............................#",
@@ -490,7 +477,6 @@
       "#..S.......................D...#",
       "################################",
     ],
-    // 7
     [
       "################################",
       "#..............................#",
@@ -511,7 +497,6 @@
       "#..S.......................D...#",
       "################################",
     ],
-    // 8
     [
       "################################",
       "#..............................#",
@@ -532,7 +517,6 @@
       "#..S.......................D...#",
       "################################",
     ],
-    // 9
     [
       "################################",
       "#..............................#",
@@ -553,7 +537,6 @@
       "#..S.......................D...#",
       "################################",
     ],
-    // 10
     [
       "################################",
       "#..............................#",
@@ -645,7 +628,52 @@
     jumpBoost:0
   };
 
+  /* ✅ HER BÖLÜMÜ OTOMATİK AŞAĞI OTURT (platform/kalp yukarıda kalmasın) */
+  function normalizeLevel(lines){
+    const src = lines.map(r => r.split(""));
+    const H = src.length;
+    const W = src[0].length;
+
+    let minY = 999, maxY = -1;
+    for(let y=1; y<H-1; y++){
+      for(let x=1; x<W-1; x++){
+        const ch = src[y][x];
+        if(ch !== "." && ch !== "#"){
+          minY = Math.min(minY, y);
+          maxY = Math.max(maxY, y);
+        }
+      }
+    }
+    if(maxY < 0) return lines;
+
+    const desiredMaxY = H - 3;         // içerik zemine yakın dursun
+    let dy = desiredMaxY - maxY;
+
+    dy = Math.max(dy, 1 - minY);
+    dy = Math.min(dy, (H - 2) - maxY);
+
+    const out = src.map(row => row.slice());
+
+    for(let y=1; y<H-1; y++){
+      for(let x=1; x<W-1; x++){
+        if(out[y][x] !== "#") out[y][x] = ".";
+      }
+    }
+
+    for(let y=1; y<H-1; y++){
+      for(let x=1; x<W-1; x++){
+        const ch = src[y][x];
+        if(ch !== "." && ch !== "#"){
+          const ny = y + dy;
+          if(ny >= 1 && ny <= H-2) out[ny][x] = ch;
+        }
+      }
+    }
+    return out.map(r => r.join(""));
+  }
+
   function parseLevel(lines){
+    lines = normalizeLevel(lines);              // ✅ en kritik satır
     grid = lines.map(line=> line.split(""));
     needHearts = 0; gotHearts = 0;
 
@@ -746,9 +774,9 @@
     if(ch==="A"){ player.alive=false; return; }
 
     if(ch==="B" && player.onGround){
-      player.vy = -11.2;
+      player.vy = -11.6;
       player.onGround = false;
-      player.jumpBoost = 6;
+      player.jumpBoost = 8;
     }
 
     if(ch==="H"){
@@ -787,7 +815,6 @@
   }
 
   function step(){
-    // çizmeden önce: tüm canvası temizleyip (letterbox alan dahil) siyah bas
     ctx.save();
     ctx.setTransform(DPR,0,0,DPR,0,0);
     ctx.clearRect(0,0,canvas.width, canvas.height);
@@ -801,12 +828,13 @@
       return;
     }
 
-    const speed = 1.85;
-    const gravity = 0.31;
-    const jumpV = 9.2;
-    const maxFall = 10;
+    /* ✅ daha geçilebilir fizik */
+    const speed = 2.05;     // azıcık daha akıcı
+    const gravity = 0.30;   // yumuşak
+    const jumpV = 10.4;     // daha rahat yetişsin
+    const maxFall = 10.5;
 
-    if(player.onGround) player.coyote = 6;
+    if(player.onGround) player.coyote = 7;
     else player.coyote = Math.max(0, player.coyote - 1);
 
     player.vx = 0;
@@ -817,12 +845,12 @@
       player.vy = -jumpV;
       player.onGround = false;
       player.coyote = 0;
-      player.jumpBoost = 10;
+      player.jumpBoost = 13;
     }
     keys.jumpPressed = false;
 
     if(keys.jumpHeld && player.jumpBoost > 0){
-      player.vy -= 0.22;
+      player.vy -= 0.24;
       player.jumpBoost--;
     } else {
       player.jumpBoost = Math.max(0, player.jumpBoost - 1);
@@ -916,7 +944,6 @@
     }
   }
 
-  // init
   loadLevel(0);
   requestAnimationFrame(step);
 })();
