@@ -79,7 +79,7 @@
       .row{grid-template-columns:1fr}
     }
 
-    /* ✅ OYUN ALANI: canvas üstte, tuş barı altta */
+    /* ✅ OYUN ALANI: 2 satır (canvas üst, tuşlar alt) */
     .gameArea{
       position:relative;
       background:#05040a;
@@ -90,29 +90,22 @@
       grid-template-rows: 1fr var(--padH);
       min-height: 520px;
     }
-
-    /* ✅ Küçük ekran */
     @media (max-width: 950px){
-      :root{ --padH: 120px; }
       .gameArea{
         border-right:0;
         border-bottom:1px solid #ffffff10;
         min-height: min(68vh, 620px);
       }
-      .touchBar{ display:flex; }
     }
 
-    /* ✅ Dokunmatik cihazlarda (genişlik ne olursa olsun) tuşları göster */
-    @media (hover: none) and (pointer: coarse) {
-      :root{ --padH: 120px; }
-      .touchBar{ display:flex; }
-    }
-
+    /* ✅ Canvas sadece üst satırda (tuşların üstüne taşmaz) */
     canvas{
+      grid-row:1;
       width:100%;
       height:100%;
       display:block;
       background:#05040a;
+      z-index:1;
     }
 
     .hint{
@@ -170,18 +163,17 @@
       line-height:1.35;
     }
 
-    /* ✅ Mobil kontrol barı (alt satır) */
+    /* ✅ Tuşlar alt satırda + üstüne taşmaması için z-index */
     .touchBar{
       grid-row:2;
-      display:none;
+      display:none; /* normalde kapalı */
       align-items:center;
       justify-content:space-between;
       padding: 12px 12px calc(12px + env(safe-area-inset-bottom));
       background: linear-gradient(180deg, #00000000, #00000066);
       border-top: 1px solid #ffffff12;
-    }
-    @media (max-width: 950px){
-      .touchBar{display:flex;}
+      z-index:5;
+      position:relative;
     }
 
     .cluster{
@@ -225,7 +217,7 @@
       border:0;
     }
 
-    /* ✅ GARANTİ: dokunmatik cihazda tuşlar her zaman görünür */
+    /* ✅ GARANTİ: dokunmatik cihazda tuşlar kesin görünür (Safari + Chrome) */
     body.touch { --padH: 120px; }
     body.touch .touchBar{ display:flex !important; }
   </style>
@@ -289,7 +281,7 @@
 
 <script>
 (() => {
-  // ✅ dokunmatik cihazı yakala ve tuşları GARANTİ aç
+  // ✅ Dokunmatik tespit (Safari + Chrome)
   const isTouch =
     (navigator.maxTouchPoints && navigator.maxTouchPoints > 0) ||
     ("ontouchstart" in window) ||
@@ -315,7 +307,6 @@
   const msgEl = document.getElementById("msg");
   const hintEl = document.getElementById("hint");
 
-  // ✅ LOGICAL sahne
   const LOG_W = 960;
   const LOG_H = 540;
 
@@ -324,7 +315,7 @@
   let OFFX = 0;
   let OFFY = 0;
 
-  // ✅ Letterbox: oyun kesilmez, ortalanır
+  // ✅ Canvas, sadece üst satırın gerçek yüksekliğini alır (touchBar ayrı satır)
   function fitCanvas(){
     const rect = canvas.getBoundingClientRect();
     const cssW = Math.max(1, Math.floor(rect.width));
@@ -341,7 +332,7 @@
     ctx.setTransform(SCALE * DPR, 0, 0, SCALE * DPR, OFFX * DPR, OFFY * DPR);
   }
   window.addEventListener("resize", () => { setVH(); fitCanvas(); }, {passive:true});
-  setTimeout(fitCanvas, 80);
+  setTimeout(fitCanvas, 120);
 
   const TILE = 30;
   const COLS = 32;
@@ -381,7 +372,6 @@
     "10. bölüm: mini final, geçilir 💗",
   ];
 
-  // ✅ LEVELS (senin mevcut halin)
   const LEVELS = [
     [
       "################################",
@@ -585,7 +575,7 @@
     ],
   ];
 
-  // ✅ düzeltme: içerik aşağı normalize (S ve D sabit)
+  // içerik aşağı normalize (S ve D sabit)
   function normalizeLevel(lines){
     const src = lines.map(r => r.split(""));
     const H = src.length;
@@ -601,8 +591,8 @@
     const isContent = (ch, x, y) => {
       if(ch === "H" || ch === "A" || ch === "B") return true;
       if(ch === "#"){
-        if(x===0 || y===0 || x===W-1 || y===H-1) return false; // border değil
-        return true; // iç platform
+        if(x===0 || y===0 || x===W-1 || y===H-1) return false;
+        return true;
       }
       return false;
     };
@@ -619,7 +609,7 @@
     }
     if(maxY < 0) return lines;
 
-    const desiredMaxY = H - 3;           // içerik zemine yakın olsun
+    const desiredMaxY = H - 3;
     let dy = desiredMaxY - maxY;
 
     dy = Math.max(dy, 1 - minY);
@@ -640,14 +630,12 @@
 
     const out = src.map(r => r.slice());
 
-    // içeriği temizle
     for(let y=1; y<H-1; y++){
       for(let x=1; x<W-1; x++){
         if(isContent(out[y][x], x, y)) out[y][x] = ".";
       }
     }
 
-    // içeriği yerleştir
     for(let y=1; y<H-1; y++){
       for(let x=1; x<W-1; x++){
         const ch = src[y][x];
@@ -685,7 +673,6 @@
   hold(rightBtn, ()=>keys.right=true, ()=>keys.right=false);
   hold(jumpBtn, ()=>{ keys.jumpHeld = true; keys.jumpPressed = true; }, ()=>{ keys.jumpHeld = false; });
 
-  // keyboard
   window.addEventListener("keydown", (e)=>{
     if(e.key==="ArrowLeft") keys.left=true;
     if(e.key==="ArrowRight") keys.right=true;
@@ -701,13 +688,11 @@
     if(e.key===" " || e.key==="ArrowUp") keys.jumpHeld=false;
   });
 
-  // UI
   document.getElementById("prev").addEventListener("click", ()=> loadLevel(Math.max(0, levelIndex-1)));
   document.getElementById("next").addEventListener("click", ()=> loadLevel(Math.min(LEVELS.length-1, levelIndex+1)));
   document.getElementById("restart").addEventListener("click", ()=> loadLevel(levelIndex));
   document.getElementById("reset").addEventListener("click", ()=> loadLevel(levelIndex));
 
-  // fullscreen
   document.getElementById("fs").addEventListener("click", async ()=>{
     try{
       if(!document.fullscreenElement){
@@ -775,7 +760,7 @@
     player.coyote = 0;
     player.jumpBoost = 0;
 
-    setTimeout(fitCanvas, 30);
+    setTimeout(fitCanvas, 50);
   }
 
   function tileAt(px, py){
@@ -878,7 +863,6 @@
   }
 
   function step(){
-    // letterbox alanı dahil temizle
     ctx.save();
     ctx.setTransform(DPR,0,0,DPR,0,0);
     ctx.clearRect(0,0,canvas.width, canvas.height);
@@ -1007,9 +991,11 @@
     }
   }
 
-  // init
   loadLevel(0);
   requestAnimationFrame(step);
+
+  // ilk açılışta da kesin otursun
+  setTimeout(fitCanvas, 300);
 })();
 </script>
 </body>
