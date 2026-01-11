@@ -21,6 +21,7 @@
       padding: max(12px, env(safe-area-inset-top)) 12px max(12px, env(safe-area-inset-bottom));
       overflow:hidden;
       touch-action:none;
+      overscroll-behavior:none;
     }
 
     .wrap{
@@ -30,6 +31,11 @@
       border-radius:var(--r);
       box-shadow:var(--shadow);
       overflow:hidden;
+
+      /* ✅ MOBİLDE yüksekliği kontrol et */
+      height:min(100svh, 100vh);
+      display:flex;
+      flex-direction:column;
     }
     header{
       padding:14px 16px;
@@ -60,14 +66,27 @@
     .row{
       display:grid;
       grid-template-columns: 1fr 330px;
-      min-height:560px;
+      min-height:0;          /* ✅ önemli */
+      flex:1;                /* ✅ wrap içinde büyüsün */
     }
     @media (max-width: 950px){
       .row{grid-template-columns:1fr}
     }
 
-    .gameArea{position:relative; background:#05040a;}
-    canvas{display:block; width:100%; height:auto; background:#05040a;}
+    .gameArea{
+      position:relative;
+      background:#05040a;
+      min-height:0;          /* ✅ taşmayı engeller */
+      flex:1;
+    }
+
+    /* ✅ Canvas artık “height:auto” değil, alanı dolduracak */
+    canvas{
+      display:block;
+      width:100%;
+      height:100%;
+      background:#05040a;
+    }
 
     aside{
       padding:14px;
@@ -117,12 +136,13 @@
     /* Touch controls */
     .touch{position:absolute; inset:0; pointer-events:none;}
     .pad{
-      position:absolute; bottom:12px;
+      position:absolute;
+      bottom: calc(12px + env(safe-area-inset-bottom)); /* ✅ safe-area */
       display:flex; gap:10px; align-items:flex-end;
       pointer-events:auto; user-select:none;
     }
-    .pad.left{left:12px}
-    .pad.right{right:12px}
+    .pad.left{left: calc(12px + env(safe-area-inset-left));}
+    .pad.right{right: calc(12px + env(safe-area-inset-right));}
     .cluster{
       display:flex; gap:10px; align-items:flex-end;
       padding:10px;
@@ -156,6 +176,20 @@
       display:none;
     }
     @media (max-width: 950px){ .hint{display:block} }
+
+    /* ✅ iOS/Safari FAKE FULLSCREEN */
+    .wrap.fullscreen{
+      position:fixed;
+      inset:0;
+      width:100vw;
+      height:100svh;
+      border-radius:0;
+      z-index:99999;
+    }
+    .wrap.fullscreen aside{display:none !important;}
+    .wrap.fullscreen .gameArea{
+      height: calc(100svh - 64px);
+    }
   </style>
 </head>
 
@@ -224,27 +258,45 @@
   const canvas = document.getElementById("c");
   const ctx = canvas.getContext("2d");
 
+  const wrap = document.querySelector(".wrap"); // ✅ eklendi
+
   const lvlEl = document.getElementById("lvl");
   const heartsEl = document.getElementById("hearts");
   const needEl = document.getElementById("need");
   const msgEl = document.getElementById("msg");
   const hintEl = document.getElementById("hint");
 
-  // hiDPI
+  // ✅ hiDPI + mobile fit (taşma fix)
   function fitCanvas(){
-    const cssW = canvas.clientWidth || canvas.parentElement.clientWidth;
-    const aspect = 960/540;
-    const cssH = Math.round(cssW / aspect);
-    canvas.style.height = cssH + "px";
+    const parent = canvas.parentElement; // .gameArea
+    const rect = parent.getBoundingClientRect();
+
+    const cssW = Math.max(320, Math.floor(rect.width));
+    const cssH = Math.max(240, Math.floor(rect.height));
+
+    const targetAspect = 16/9;
+    let drawW = cssW;
+    let drawH = Math.round(drawW / targetAspect);
+    if(drawH > cssH){
+      drawH = cssH;
+      drawW = Math.round(drawH * targetAspect);
+    }
+
+    canvas.style.width = drawW + "px";
+    canvas.style.height = drawH + "px";
+    canvas.style.margin = "0 auto";
+
     const dpr = Math.min(2, window.devicePixelRatio || 1);
-    const w = Math.round(cssW * dpr);
-    const h = Math.round(cssH * dpr);
+    const w = Math.round(drawW * dpr);
+    const h = Math.round(drawH * dpr);
+
     if(canvas.width !== w || canvas.height !== h){
       canvas.width = w; canvas.height = h;
     }
     ctx.setTransform(dpr,0,0,dpr,0,0);
   }
   window.addEventListener("resize", fitCanvas, {passive:true});
+  window.addEventListener("orientationchange", () => setTimeout(fitCanvas, 250), {passive:true});
   fitCanvas();
 
   const TILE = 30;
@@ -544,13 +596,56 @@
   document.getElementById("restart").addEventListener("click", ()=> loadLevel(levelIndex));
   document.getElementById("reset").addEventListener("click", ()=> loadLevel(levelIndex));
 
-  // fullscreen
-  document.getElementById("fs").addEventListener("click", async ()=>{
-    const el = document.documentElement;
+  // ✅ FULLSCREEN: Android gerçek + iOS fake
+  const fsBtn = document.getElementById("fs");
+  function isIOS(){
+    return /iPhone|iPad|iPod/i.test(navigator.userAgent);
+  }
+  async function tryLockLandscape(){
     try{
-      if(!document.fullscreenElement) await el.requestFullscreen();
-      else await document.exitFullscreen();
+      if(screen.orientation && screen.orientation.lock){
+        await screen.orientation.lock("landscape");
+      }
     }catch{}
+  }
+  async function tryUnlockOrientation(){
+    try{
+      if(screen.orientation && screen.orientation.unlock){
+        screen.orientation.unlock();
+      }
+    }catch{}
+  }
+
+  fsBtn.addEventListener("click", async ()=>{
+    // Android/Chrome: gerçek fullscreen
+    if(!document.fullscreenElement && wrap.requestFullscreen && !isIOS()){
+      try{
+        await wrap.requestFullscreen({ navigationUI:"hide" });
+        await tryLockLandscape();
+        setTimeout(fitCanvas, 250);
+        return;
+      }catch(e){}
+    }
+
+    // çıkış
+    if(document.fullscreenElement && document.exitFullscreen){
+      try{
+        await document.exitFullscreen();
+        await tryUnlockOrientation();
+        setTimeout(fitCanvas, 250);
+        return;
+      }catch(e){}
+    }
+
+    // iOS/Safari: fake fullscreen
+    wrap.classList.toggle("fullscreen");
+    setTimeout(fitCanvas, 80);
+  });
+
+  // ✅ gerçek fullscreen olunca class senkronla (Android'de sidebar gizlensin)
+  document.addEventListener("fullscreenchange", ()=>{
+    wrap.classList.toggle("fullscreen", !!document.fullscreenElement);
+    setTimeout(fitCanvas, 200);
   });
 
   const player = {
@@ -600,6 +695,8 @@
     player.alive = true;
     player.coyote = 0;
     player.jumpBoost = 0;
+
+    fitCanvas(); // ✅ level değişince de oturtsun
   }
 
   function tileAt(px, py){
@@ -661,9 +758,9 @@
     if(ch==="A"){ player.alive=false; return; }
 
     if(ch==="B" && player.onGround){
-      player.vy = -11.2; // güçlü zıplama taşı
+      player.vy = -11.2;
       player.onGround = false;
-      player.jumpBoost = 6; // kısa süre ekstra yükseltme
+      player.jumpBoost = 6;
     }
 
     if(ch==="H"){
@@ -691,7 +788,6 @@
     ctx.fillStyle = g;
     ctx.fillRect(0,0,960,540);
 
-    // küçük parıltı noktaları (tatlı doku)
     ctx.fillStyle = "#ffffff12";
     for(let i=0;i<24;i++){
       const x = (i*43 + levelIndex*17) % 960;
@@ -709,13 +805,11 @@
       return;
     }
 
-    // Daha kontrollü fizik
-    const speed = 1.85;        // hız düşürüldü ✅
-    const gravity = 0.31;      // daha “yumuşak” ✅
-    const jumpV = 9.2;         // daha yüksek zıplama ✅
+    const speed = 1.85;
+    const gravity = 0.31;
+    const jumpV = 9.2;
     const maxFall = 10;
 
-    // coyote time: zeminden ayrıldıktan sonra 6 frame zıplama hakkı
     if(player.onGround) player.coyote = 6;
     else player.coyote = Math.max(0, player.coyote - 1);
 
@@ -723,17 +817,15 @@
     if(keys.left) player.vx = -speed;
     if(keys.right) player.vx = speed;
 
-    // zıplama başlatma (jumpPressed veya coyote)
     if(keys.jumpPressed && player.coyote > 0){
       player.vy = -jumpV;
       player.onGround = false;
       player.coyote = 0;
-      player.jumpBoost = 10; // basılı tutunca ekstra yükseltme başlayacak
+      player.jumpBoost = 10;
     }
 
     keys.jumpPressed = false;
 
-    // basılı tutarak daha yüksek zıplama (jumpBoost frames)
     if(keys.jumpHeld && player.jumpBoost > 0){
       player.vy -= 0.22;
       player.jumpBoost--;
@@ -755,10 +847,8 @@
   }
 
   function draw(){
-    // background wallpaper per level ✅
     drawWallpaper();
 
-    // tiles
     for(let y=0;y<ROWS;y++){
       for(let x=0;x<COLS;x++){
         const ch = grid[y][x];
@@ -799,27 +889,20 @@
       }
     }
 
-    // player (minnoş kedi)
     const pl = player;
-
     ctx.fillStyle = "#ffffff";
     ctx.fillRect(pl.x, pl.y, pl.w, pl.h);
-
-    // ears
     ctx.fillRect(pl.x+1, pl.y-4, 6, 6);
     ctx.fillRect(pl.x+pl.w-7, pl.y-4, 6, 6);
 
-    // eyes
     ctx.fillStyle = "#111";
     ctx.fillRect(pl.x+4, pl.y+8, 3, 3);
     ctx.fillRect(pl.x+pl.w-7, pl.y+8, 3, 3);
 
-    // blush
     ctx.fillStyle = "#ff7a9c";
     ctx.fillRect(pl.x+3, pl.y+12, 3, 2);
     ctx.fillRect(pl.x+pl.w-6, pl.y+12, 3, 2);
 
-    // bow
     ctx.fillStyle = "#ff4d6d";
     ctx.fillRect(pl.x+pl.w-8, pl.y-2, 3, 3);
     ctx.fillRect(pl.x+pl.w-5, pl.y-3, 3, 3);
@@ -837,7 +920,6 @@
     }
   }
 
-  // init
   parseLevel(LEVELS[0]);
   needEl.textContent = needHearts;
   heartsEl.textContent = gotHearts;
