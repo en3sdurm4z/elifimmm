@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Elif’im — Minnoş Premium Sürpriz 💗</title>
+  <title>Elif’im — Minnoş Sürpriz 💗</title>
   <meta name="theme-color" content="#ff4d6d" />
 
   <style>
@@ -35,7 +35,7 @@
       overflow-x:hidden;
     }
 
-    /* Premium background sparkle */
+    /* soft sparkle */
     .bg-sparkle{
       position:fixed; inset:-40px;
       background:
@@ -95,6 +95,25 @@
       border-color:#ffffff14;
     }
     .nav-right{display:flex; gap:8px; flex-wrap:wrap; justify-content:flex-end}
+
+    .subline{
+      color:var(--muted);
+      font-weight:800;
+      font-size:12px;
+      margin-top:2px;
+    }
+    .prod{
+      margin-top:3px;
+      display:inline-flex;
+      align-items:center;
+      gap:8px;
+      font-size:11px;
+      font-weight:900;
+      color:#ffffffcc;
+      letter-spacing:.3px;
+      opacity:.85;
+    }
+    .prod::before{ content:"⚡"; }
 
     /* Layout */
     .wrap{width:min(1100px, 92vw); margin:0 auto; padding:22px 0 70px}
@@ -180,6 +199,12 @@
     .b3{background: linear-gradient(135deg, var(--accent3), #7fffe0); box-shadow:0 18px 40px #00d4a122}
     .b4{background: linear-gradient(135deg, #111, #333); box-shadow:0 18px 40px #00000055}
     .b5{background: linear-gradient(135deg, #ff9f1c, #ffd166); color:#2b1d00; box-shadow:0 18px 40px #ff9f1c22}
+    .ghost{
+      background:#ffffff10 !important;
+      color:var(--text) !important;
+      border:1px solid #ffffff18 !important;
+      box-shadow:none !important;
+    }
 
     /* Hero photo */
     .hero{
@@ -195,6 +220,7 @@
       position:relative;
       box-shadow: 0 26px 80px #00000075;
     }
+    .photo.clickable{ cursor: zoom-in; }
     .photo img{
       width:100%;
       display:block;
@@ -315,7 +341,7 @@
     .t-main b{display:block; font-weight:950}
     .t-main span{color:var(--muted); font-size:13px}
 
-    /* Footer note */
+    /* Quote */
     .quote{
       margin-top:12px;
       border-radius:18px;
@@ -342,7 +368,7 @@
       100%{transform:translate(calc(-50% + var(--dx)), -280px) scale(1.25); opacity:0}
     }
 
-    /* Premium loader */
+    /* Loader */
     .loader{
       position:fixed; inset:0; z-index:9999;
       display:grid; place-items:center;
@@ -409,14 +435,8 @@
       margin-top:14px;
       display:flex; justify-content:flex-end; gap:10px; flex-wrap:wrap;
     }
-    .ghost{
-      background:#ffffff10 !important;
-      color:var(--text) !important;
-      border:1px solid #ffffff18 !important;
-      box-shadow:none !important;
-    }
 
-    /* little highlight */
+    /* highlight */
     .hi{
       background: linear-gradient(90deg, #ffffff, #ffd1dc);
       -webkit-background-clip:text;
@@ -424,19 +444,147 @@
       color:transparent;
       font-weight:950;
     }
+
+    /* Lightbox */
+    .lightbox{
+      position:fixed; inset:0; z-index:9998;
+      background:#000000d0;
+      display:none;
+      align-items:center;
+      justify-content:center;
+      padding:18px;
+    }
+    .lightbox.open{ display:flex; }
+    .lightbox img{
+      width:min(980px, 96vw);
+      max-height:86vh;
+      object-fit:contain;
+      border-radius:22px;
+      border:1px solid #ffffff22;
+      box-shadow: 0 40px 160px #000000aa;
+    }
+    .lightbox .close{
+      position:fixed; top:16px; right:16px;
+      border-radius:14px;
+      padding:10px 12px;
+      background:#ffffff14;
+      border:1px solid #ffffff22;
+      color:#fff; font-weight:900;
+      cursor:pointer;
+    }
+
+    /* Intro (1 time) */
+    .intro{
+      position:fixed; inset:0; z-index:9997;
+      display:none;
+      place-items:center;
+      background:#00000085;
+      backdrop-filter: blur(10px);
+      padding:18px;
+    }
+    .intro.show{ display:grid; }
+    .intro-box{
+      width:min(560px, 92vw);
+      border-radius:26px;
+      border:1px solid #ffffff18;
+      background:#ffffff0c;
+      box-shadow: 0 50px 160px #000000aa;
+      padding:18px;
+      text-align:center;
+    }
+    .intro-box h2{
+      margin:0;
+      font-size:22px;
+      font-weight:950;
+      letter-spacing:.2px;
+    }
+    .intro-box p{
+      margin:10px 0 0;
+      color:var(--muted);
+      font-weight:800;
+      line-height:1.5;
+      font-size:14px;
+    }
+
+    /* Message box */
+    .msgbox{
+      margin-top:14px;
+      border-radius:18px;
+      background:#ffffff0c;
+      border:1px solid #ffffff14;
+      padding:12px;
+      display:grid;
+      gap:10px;
+    }
+    .msgbox label{
+      font-weight:950;
+      font-size:13px;
+      color:#ffffffd8;
+    }
+    .msgrow{
+      display:flex;
+      gap:10px;
+      flex-wrap:wrap;
+    }
+    .msgrow input{
+      flex:1 1 240px;
+      border-radius:16px;
+      border:1px solid #ffffff18;
+      background:#0b0710aa;
+      color:var(--text);
+      padding:12px 12px;
+      outline:none;
+      font-weight:850;
+    }
+    .msgrow input::placeholder{color:#ffffff77}
+    .msglist{
+      display:grid;
+      gap:8px;
+    }
+    .msgitem{
+      border-radius:14px;
+      background:#ffffff0a;
+      border:1px solid #ffffff14;
+      padding:10px 10px;
+      color:#ffffffdd;
+      font-weight:850;
+      line-height:1.35;
+      font-size:13px;
+      display:flex;
+      justify-content:space-between;
+      gap:10px;
+    }
+    .msgmeta{
+      color:#ffffff99;
+      font-weight:800;
+      font-size:11px;
+      white-space:nowrap;
+      margin-left:8px;
+    }
   </style>
 </head>
 
 <body>
   <div class="bg-sparkle"></div>
 
-  <!-- Premium Loader -->
+  <!-- Loader -->
   <div class="loader" id="loader">
     <div class="loader-box">
       <div class="loader-badge">💗</div>
       <p class="loader-title">Elif’im için minnoş sayfa hazırlanıyor…</p>
-      <p class="loader-sub">Hazır Ol Bebek • şaka modu açıldı • sarılma isteği arttırıldı 😄</p>
+      <p class="loader-sub">Hazır ol bebek • şaka modu açık • sarılma isteği tavan 😄</p>
       <div class="bar"><div></div></div>
+    </div>
+  </div>
+
+  <!-- Intro (only once per device) -->
+  <div class="intro" id="intro">
+    <div class="intro-box">
+      <h2>Elif’im 💗</h2>
+      <p>Bu sayfayı ben yaptım… sadece sen gül diye. (Tamam tamam, çok minnoşum 😄)</p>
+      <div style="margin-top:14px">
+        <button id="introGo">Devam et ✨</button>
+      </div>
     </div>
   </div>
 
@@ -446,7 +594,7 @@
         <div class="brand-badge">💞</div>
         <div>
           <div style="font-weight:950">Elif’im</div>
-          <div style="color:var(--muted); font-weight:800; font-size:12px">Elif’im için <</div>
+          <div class="subline">Elif’im için küçük bir sürpriz</div>
           <div class="prod">Prod By Enes Durmaz</div>
         </div>
       </div>
@@ -472,7 +620,7 @@
         <p class="sub">
           Burada her şey “düzenli, şık, tatlı” ve en önemlisi:
           <b>senin minnoşluğuna yakışır</b> şekilde.
-          (Evet, bu siteyi yaparken kalbim “loading…” oldu 😄)
+          (Bu siteyi yaparken kalbim “loading…” oldu 😄)
         </p>
 
         <div class="split">
@@ -486,6 +634,17 @@
           <button class="b3" id="mode">Minnoş modu: ON ✨</button>
           <button class="b5" id="joke">Elif’im’e özel şaka 😄</button>
           <button class="b4" id="secret">Gizli mesajı bul 🔎</button>
+        </div>
+
+        <!-- Elif'e not bırak (kalıcı) -->
+        <div class="msgbox">
+          <label>💌 Elif’im’e minnoş bir not bırak</label>
+          <div class="msgrow">
+            <input id="msgInput" maxlength="120" placeholder="Mesela: Bugün de seni seçiyorum Elif’im 💗" />
+            <button class="b2" id="msgAdd">Kaydet</button>
+            <button class="ghost" id="msgClear" title="Bu cihazdaki notları temizler">Temizle</button>
+          </div>
+          <div class="msglist" id="msgList"></div>
         </div>
 
         <div class="section-title" style="margin-top:18px">
@@ -519,7 +678,7 @@
       </div>
 
       <aside class="hero">
-        <div class="photo">
+        <div class="photo clickable" id="photoBox">
           <img src="IMG_0370.jpeg" alt="Elif’im ve Ben 💗" />
           <div class="cap">
             <div>
@@ -533,7 +692,7 @@
         <div class="card pad" id="zaman">
           <div class="section-title">
             <h2>⏳ Zaman Sayaçları</h2>
-            <div class="chip">Premium detay</div>
+            <div class="chip">Küçük detay</div>
           </div>
 
           <div class="stats">
@@ -568,7 +727,7 @@
               <div class="t-badge">💗</div>
               <div class="t-main">
                 <b>Bugün</b>
-                <span>Bu premium minnoş siteyi Elif’im’in gülüşü için hazırladım.</span>
+                <span>Bu sayfayı Elif’im’in gülüşü için hazırladım.</span>
               </div>
             </div>
             <div class="t-row">
@@ -632,9 +791,15 @@
         </div>
       </div>
     </section>
-
   </main>
 
+  <!-- Lightbox -->
+  <div class="lightbox" id="lightbox">
+    <button class="close" id="closeLight">Kapat ✖</button>
+    <img src="IMG_0370.jpeg" alt="Elif’im 💗">
+  </div>
+
+  <!-- Modal -->
   <dialog id="dlg">
     <div class="modal">
       <h3 id="dlgTitle">Minnoş Bildirim 💞</h3>
@@ -647,10 +812,28 @@
   </dialog>
 
   <script>
-    // Premium loader: kısa açılış
+    // Açılış: kısa animasyon
     const loader = document.getElementById("loader");
     window.addEventListener("load", () => {
       setTimeout(()=> loader.classList.add("hide"), 900);
+    });
+
+    // Intro - sadece 1 kere
+    const intro = document.getElementById("intro");
+    const introGo = document.getElementById("introGo");
+    const introKey = "elif_intro_seen_v1";
+    if(!localStorage.getItem(introKey)){
+      setTimeout(()=> intro.classList.add("show"), 1100);
+    }
+    introGo?.addEventListener("click", ()=>{
+      intro.classList.remove("show");
+      localStorage.setItem(introKey, "1");
+    });
+    intro?.addEventListener("click",(e)=>{
+      if(e.target === intro){
+        intro.classList.remove("show");
+        localStorage.setItem(introKey, "1");
+      }
     });
 
     // Elements
@@ -677,6 +860,16 @@
     const dlgClose = document.getElementById("dlgClose");
     const dlgMore = document.getElementById("dlgMore");
 
+    // Lightbox
+    const photoBox = document.getElementById("photoBox");
+    const lightbox = document.getElementById("lightbox");
+    const closeLight = document.getElementById("closeLight");
+    photoBox?.addEventListener("click", () => lightbox.classList.add("open"));
+    closeLight?.addEventListener("click", () => lightbox.classList.remove("open"));
+    lightbox?.addEventListener("click", (e) => {
+      if(e.target === lightbox) lightbox.classList.remove("open");
+    });
+
     // Date: 25 June 2025
     const start = new Date("2025-06-25T00:00:00");
 
@@ -688,14 +881,12 @@
       const totalMinutes = Math.floor(diff / 60000);
       const d = Math.floor(totalMinutes / (60*24));
       const h = Math.floor((totalMinutes - d*60*24) / 60);
-
       const hrsTotal = Math.floor(diff / 3600000);
 
       togetherChip.textContent = `⏳ Tanışalı: ${d} gün ${h} saat (Elif’im etkisi 💗)`;
       daysEl.textContent = `${d} gün`;
       hoursEl.textContent = `${hrsTotal} saat`;
 
-      // mini premium quote değişimleri
       if(d >= 30) quoteText.textContent = "“Elif’im… seninle geçen her gün daha ‘biz’.” 💞";
       if(d >= 120) quoteText.textContent = "“Kalbimin en tatlı adresi: Elif’im.” 🏡💗";
       if(d >= 200) quoteText.textContent = "“Elif’im, bu kadar minnoş olmak yasal mı? 😄💘”";
@@ -795,7 +986,70 @@
         setTimeout(()=> e.remove(), 2200);
       }
     }
+
+    // Message box (localStorage)
+    const msgInput = document.getElementById("msgInput");
+    const msgAdd = document.getElementById("msgAdd");
+    const msgClear = document.getElementById("msgClear");
+    const msgList = document.getElementById("msgList");
+    const msgKey = "elif_msgs_v1";
+
+    function loadMsgs(){
+      try{
+        return JSON.parse(localStorage.getItem(msgKey) || "[]");
+      }catch{ return []; }
+    }
+    function saveMsgs(list){
+      localStorage.setItem(msgKey, JSON.stringify(list));
+    }
+    function renderMsgs(){
+      const list = loadMsgs();
+      msgList.innerHTML = "";
+      if(list.length === 0){
+        const empty = document.createElement("div");
+        empty.className = "msgitem";
+        empty.innerHTML = `<span>Henüz not yok… (Elif’im için bir tane bıraksana 💗)</span><span class="msgmeta">🧸</span>`;
+        msgList.appendChild(empty);
+        return;
+      }
+      list.slice().reverse().forEach(item=>{
+        const row = document.createElement("div");
+        row.className = "msgitem";
+        row.innerHTML = `<span>${escapeHtml(item.text)}</span><span class="msgmeta">${item.time}</span>`;
+        msgList.appendChild(row);
+      });
+    }
+
+    function addMsg(){
+      const text = (msgInput.value || "").trim();
+      if(!text) return showModal("Minnoş uyarı 🧸", "Bir cümle yazsana… Elif’im hak ediyor 💗");
+      const now = new Date();
+      const time = now.toLocaleString("tr-TR", { day:"2-digit", month:"2-digit", year:"numeric", hour:"2-digit", minute:"2-digit" });
+      const list = loadMsgs();
+      list.push({ text, time });
+      saveMsgs(list);
+      msgInput.value = "";
+      pop(10);
+      renderMsgs();
+    }
+
+    function clearMsgs(){
+      localStorage.removeItem(msgKey);
+      pop(8);
+      renderMsgs();
+    }
+
+    function escapeHtml(s){
+      return s.replace(/[&<>"']/g, (c)=>({
+        "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"
+      }[c]));
+    }
+
+    msgAdd?.addEventListener("click", addMsg);
+    msgInput?.addEventListener("keydown", (e)=>{ if(e.key === "Enter") addMsg(); });
+    msgClear?.addEventListener("click", clearMsgs);
+
+    renderMsgs();
   </script>
 </body>
 </html>
-
