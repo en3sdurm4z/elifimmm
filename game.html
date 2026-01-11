@@ -6,9 +6,7 @@
   <title>Elif’im — Minoş Kedi Macerası 🧸💗</title>
   <style>
     :root{
-      --bg0:#07060c; --bg1:#120b18;
       --text:#f5f2ff; --muted:#cfc6ea;
-      --accent:#ff4d6d; --accent2:#7b2cff; --accent3:#00d4a1;
       --glass:#ffffff0a; --stroke:#ffffff14; --shadow:0 40px 160px #000000aa;
       --r:22px;
     }
@@ -17,18 +15,14 @@
     body{
       margin:0;
       font-family: ui-rounded, system-ui, -apple-system, "Segoe UI", Arial;
-      background:
-        radial-gradient(1100px 700px at 10% -10%, #ff4d6d40, transparent 60%),
-        radial-gradient(900px 650px at 110% 10%, #7b2cff40, transparent 60%),
-        radial-gradient(900px 650px at 50% 120%, #00d4a140, transparent 60%),
-        linear-gradient(180deg, var(--bg0), var(--bg1));
+      background: linear-gradient(180deg, #07060c, #120b18);
       color:var(--text);
-      display:grid;
-      place-items:center;
+      display:grid; place-items:center;
       padding: max(12px, env(safe-area-inset-top)) 12px max(12px, env(safe-area-inset-bottom));
       overflow:hidden;
       touch-action:none;
     }
+
     .wrap{
       width:min(1100px, 98vw);
       background:var(--glass);
@@ -47,7 +41,7 @@
     .badge{
       width:36px; height:36px; border-radius:14px;
       display:grid; place-items:center;
-      background: linear-gradient(135deg, var(--accent), var(--accent2));
+      background: linear-gradient(135deg, #ff4d6d, #7b2cff);
       border:1px solid #ffffff22;
       box-shadow:0 14px 34px #ff4d6d22;
       user-select:none;
@@ -91,21 +85,21 @@
       margin-bottom:12px;
     }
     .box h3{margin:0 0 8px; font-size:13px; font-weight:950}
-    .box p{margin:0; color:var(--muted); font-weight:800; font-size:12.5px; line-height:1.45}
+    .box p{margin:0; color:#cfc6ea; font-weight:800; font-size:12.5px; line-height:1.45}
 
     .btns{display:flex; gap:10px; flex-wrap:wrap; margin-top:10px}
     button{
       appearance:none; border:0; cursor:pointer;
       color:#fff; font-weight:950;
       padding:10px 12px; border-radius:14px;
-      background: linear-gradient(135deg, var(--accent), #ff7a9c);
+      background: linear-gradient(135deg, #ff4d6d, #ff7a9c);
       box-shadow:0 16px 42px #ff4d6d25;
       transition:.12s ease;
     }
     button:hover{transform:translateY(-1px); filter:brightness(1.05)}
     button:active{transform:translateY(1px)}
-    .b2{background:linear-gradient(135deg, var(--accent2), #b08cff); box-shadow:0 16px 42px #7b2cff22}
-    .b3{background:linear-gradient(135deg, var(--accent3), #7fffe0); color:#062015; box-shadow:0 16px 42px #00d4a122}
+    .b2{background:linear-gradient(135deg, #7b2cff, #b08cff); box-shadow:0 16px 42px #7b2cff22}
+    .b3{background:linear-gradient(135deg, #00d4a1, #7fffe0); color:#062015; box-shadow:0 16px 42px #00d4a122}
     .ghost{background:#ffffff10 !important; border:1px solid #ffffff18 !important; box-shadow:none !important}
 
     .mini{
@@ -154,7 +148,7 @@
     .hint{
       position:absolute; top:10px; left:10px; right:10px;
       text-align:center;
-      color:#ffffffc7;
+      color:#ffffffd0;
       font-weight:900;
       font-size:12px;
       text-shadow: 0 12px 28px #000;
@@ -172,7 +166,7 @@
         <div class="badge">🧸</div>
         <div class="title">
           <b>Elif’im için: Minoş Kedi Macerası 💗</b>
-          <span>Mobil: dokun • PC: ← → + Space • R: sıfırla</span>
+          <span>Mobil: dokun • PC: ← → + Space (basılı tut zıpla) • R: sıfırla</span>
         </div>
       </div>
       <div class="pill">Bölüm <span id="lvl">1</span> • Kalp <span id="hearts">0</span>/<span id="need">0</span></div>
@@ -180,7 +174,7 @@
 
     <div class="row">
       <div class="gameArea">
-        <div class="hint">İpucu: Soldaki tuşlar ile hareket et, 💗 kalpleri topla, 🚪 kapıya git.</div>
+        <div class="hint" id="hint">İpucu: Kalpleri topla 💗 → kapıya git 🚪</div>
         <canvas id="c" width="960" height="540"></canvas>
 
         <div class="touch" aria-hidden="true">
@@ -201,11 +195,12 @@
 
       <aside>
         <div class="box">
-          <h3>🎯 Nasıl oynanır</h3>
+          <h3>🎯 Nasıl oynanır (net)</h3>
           <p>
-            🧸 Minoş Kedi’yi yönet. <br/>
-            💗 Kalpleri topla, 🚪 kapıdan çık. <br/>
-            🟩 Asit = oyun biter. 🟨 Zeminlerde zıpla zıpla 😄
+            1) 💗 Kalpleri topla <br/>
+            2) 🚪 Kapıya git <br/>
+            3) 🟩 Asit = ölürsün (dikkat) <br/>
+            4) 🟨 Zıplama taşı (B) = ekstra zıplarsın
           </p>
           <div class="btns">
             <button class="b2" id="prev">⬅ Önceki</button>
@@ -213,16 +208,12 @@
             <button class="b3" id="restart">Sıfırla</button>
             <button class="ghost" id="fs">⛶ Tam ekran</button>
           </div>
-          <div class="mini" id="msg">Elif’im… bu oyun “minnoşluk” testidir. Kaybedersen sarılma cezası var 😄💗</div>
+          <div class="mini" id="msg">Elif’im… ilk 2 bölüm çok kolay. Sonra yavaş yavaş “mini engeller” geliyor 😄💗</div>
         </div>
 
         <div class="box">
-          <h3>🛠 50 bölüm mevzusu</h3>
-          <p>
-            Şu an 15 bölüm hazır. İstersen bunu 50’ye iki şekilde çıkarırız: <br/>
-            1) Hepsini “özel tasarım” <br/>
-            2) 15 özel + geri kalanı aynı mantıkla kaliteli varyasyon
-          </p>
+          <h3>✨ Prod By</h3>
+          <p>Prod By Enes Durmaz</p>
         </div>
       </aside>
     </div>
@@ -237,6 +228,7 @@
   const heartsEl = document.getElementById("hearts");
   const needEl = document.getElementById("need");
   const msgEl = document.getElementById("msg");
+  const hintEl = document.getElementById("hint");
 
   // hiDPI
   function fitCanvas(){
@@ -260,8 +252,8 @@
   const ROWS = 18;
 
   // tiles:
-  // # wall, . empty, S spawn, H heart, D door, A acid, B bouncy
-  const COLORS = {
+  // # wall, . empty, S spawn, H heart, D door, A acid, B bounce
+  const colors = {
     wall:"#2a2a33",
     acid:"#00d4a1",
     bounce:"#ffd166",
@@ -269,128 +261,235 @@
     heart:"#ff4d6d",
   };
 
-  const messages = [
-    "Elif’im… bu oyun “minnoşluk” testidir. Kaybedersen sarılma cezası var 😄💗",
-    "Kalpleri topla… çünkü Elif’im kalp koleksiyonumun en güzeli 💞",
-    "Bu bölüm biraz zor olabilir… ama Elif’im daha zoru: ‘çok tatlı olmak’ 🧸",
-    "İpucu: Zıplarken panik yok… minnoşça sakin 😌",
-    "Bölüm bittiğinde ödül: Elif’im’in gülüşü (en pahalı loot) ✨",
+  // Her bölüm farklı “tatlı wallpaper” (canvas içinde gradient)
+  const wallpapers = [
+    ["#ff4d6d33","#7b2cff33","#00d4a133"],
+    ["#ffd1dc33","#b08cff33","#7fffe033"],
+    ["#ff9f1c33","#ff4d6d33","#7b2cff33"],
+    ["#7fffe033","#00d4a133","#b08cff33"],
+    ["#a0c4ff33","#ffc6ff33","#ffd6a533"],
+    ["#caffbf33","#ffd6a533","#ffadad33"],
+    ["#bde0fe33","#ffafcc33","#cdb4db33"],
+    ["#f1c0e833","#cfbaf033","#a3c4f333"],
+    ["#ffcad433","#bdb2ff33","#caffbf33"],
+    ["#ffd16633","#ef476f33","#118ab233"],
   ];
 
+  const messages = [
+    "Elif’im… 1. bölüm: sadece yürü + kalp + kapı 😄",
+    "2. bölüm: zıplama var ama tatlı tatlı 💗",
+    "3. bölüm: asit geldi (yeşil) dikkat minnoşum 🧸",
+    "4. bölüm: asit üstünden atlamayı öğreniyoruz ✨",
+    "5. bölüm: B zıplama taşı (sarı) geldi 😄",
+    "6. bölüm: B ile daha yükseğe çıkıyoruz 💞",
+    "7. bölüm: biraz kombin… ama geçilir ✅",
+    "8. bölüm: kalpleri sakladım, yine de adil 😄",
+    "9. bölüm: minnoş refleks lazım 🧸",
+    "10. bölüm: mini final gibi… ama kesin geçilir 💗",
+  ];
+
+  // Geçilebilir, anlaşılır 10 bölüm
   const LEVELS = [
     [
       "################################",
       "#..............................#",
-      "#..............H...............#",
-      "#..............#...............#",
-      "#..............#...............#",
-      "#......B.......#.......B.......#",
-      "#..............#...............#",
-      "#..........H...#...H...........#",
-      "#..............#...............#",
-      "#..S...........#.............D.#",
-      "#############..#..##############",
-      "#..............................#",
-      "#..............A...............#",
       "#..............................#",
       "#..............................#",
-      "#........H.............H.......#",
+      "#.............H................#",
+      "#..............................#",
+      "#..............................#",
+      "#..............................#",
+      "#..............................#",
+      "#..S.......................D...#",
+      "################################",
+      "#..............................#",
+      "#..............................#",
+      "#..............................#",
+      "#..............................#",
+      "#..............................#",
       "#..............................#",
       "################################",
     ],
     [
       "################################",
       "#..............................#",
-      "#..........H.............H.....#",
-      "#............#######...........#",
       "#..............................#",
-      "#....B....................B....#",
-      "#.............A................#",
-      "#.............A................#",
-      "#..S..........A.............D..#",
-      "##########....A....#############",
+      "#.............H................#",
+      "#...........######.............#",
       "#..............................#",
-      "#..............H...............#",
+      "#.....................H........#",
+      "#..................######......#",
       "#..............................#",
-      "#.............####.............#",
+      "#..S.......................D...#",
+      "################################",
       "#..............................#",
-      "#....H.....................H...#",
+      "#..............................#",
+      "#..............................#",
+      "#..............................#",
+      "#..............................#",
       "#..............................#",
       "################################",
     ],
     [
       "################################",
       "#..............................#",
-      "#..H...............H...........#",
-      "#...........####...............#",
       "#..............................#",
-      "#.....A..................A.....#",
-      "#.....A..................A.....#",
-      "#.....A..................A.....#",
-      "#..S..A......B....B......A..D..#",
-      "######A##################A######",
+      "#.............H................#",
+      "#...........######.............#",
       "#..............................#",
-      "#..............H...............#",
+      "#...........A A A A............#",
       "#..............................#",
-      "#............######............#",
+      "#.....................H........#",
+      "#..S.......................D...#",
+      "################################",
       "#..............................#",
-      "#..H.......................H...#",
+      "#..............................#",
+      "#..............................#",
+      "#..............................#",
+      "#..............................#",
       "#..............................#",
       "################################",
     ],
     [
       "################################",
       "#..............................#",
-      "#..........H...................#",
-      "#..............#######.........#",
+      "#........H.....................#",
+      "#.......####...................#",
       "#..............................#",
-      "#...B....................B.....#",
-      "#....................H.........#",
-      "#..............A...............#",
-      "#..S...........A...........D...#",
-      "############...A...#############",
-      "#..............A...............#",
-      "#..............A...............#",
-      "#..............A...............#",
+      "#..........A A A...............#",
       "#..............................#",
-      "#....H.....................H...#",
+      "#.....................H........#",
+      "#..................####........#",
+      "#..S.......................D...#",
+      "################################",
+      "#..............................#",
+      "#..............................#",
+      "#..............................#",
+      "#..............................#",
       "#..............................#",
       "#..............................#",
       "################################",
     ],
-    // 5..15 biraz daha “platform” vari
-    ...Array.from({length:11}, (_,i)=>{
-      const k = i+5;
-      const g = Array.from({length:ROWS}, ()=> Array(COLS).fill("."));
-      for(let y=0;y<ROWS;y++){
-        for(let x=0;x<COLS;x++){
-          if(y===0||y===ROWS-1||x===0||x===COLS-1) g[y][x]="#";
-        }
-      }
-      // platforms
-      const p1 = 4 + (k*3)%10;
-      const p2 = 16 + (k*5)%10;
-      for(let x=p1;x<p1+8;x++) g[10][x]="#";
-      for(let x=p2;x<p2+8;x++) g[7][x]="#";
-      for(let x=6;x<26;x++) g[14][x]="#";
-
-      // hazards
-      for(let x=12;x<20;x++) g[15][x]="A";
-
-      // bouncy tiles
-      g[13][8]="B"; g[13][24]="B";
-
-      // spawn/door
-      g[13][2]="S";
-      g[13][29]="D";
-
-      // hearts
-      g[6][p2+3]="H";
-      g[9][p1+4]="H";
-      g[12][18]="H";
-
-      return g.map(r=> r.join(""));
-    }),
+    [
+      "################################",
+      "#..............................#",
+      "#..............H...............#",
+      "#..............................#",
+      "#..........B...................#",
+      "#.........####.................#",
+      "#..............................#",
+      "#......................H.......#",
+      "#....................####......#",
+      "#..S.......................D...#",
+      "################################",
+      "#..............................#",
+      "#..............................#",
+      "#..............................#",
+      "#..............................#",
+      "#..............................#",
+      "#..............................#",
+      "################################",
+    ],
+    [
+      "################################",
+      "#..............................#",
+      "#..............H...............#",
+      "#..............................#",
+      "#....B........####.............#",
+      "#..............................#",
+      "#...........A A A..............#",
+      "#..............................#",
+      "#......................H.......#",
+      "#..S.......................D...#",
+      "################################",
+      "#..............................#",
+      "#..............................#",
+      "#..............................#",
+      "#..............................#",
+      "#..............................#",
+      "#..............................#",
+      "################################",
+    ],
+    [
+      "################################",
+      "#..............................#",
+      "#........H.....................#",
+      "#.......####...................#",
+      "#..................H...........#",
+      "#...............####...........#",
+      "#...........A A A..............#",
+      "#..............................#",
+      "#....B.........................#",
+      "#..S.......................D...#",
+      "################################",
+      "#..............................#",
+      "#..............................#",
+      "#..............................#",
+      "#..............................#",
+      "#..............................#",
+      "#..............................#",
+      "################################",
+    ],
+    [
+      "################################",
+      "#..............................#",
+      "#.............H................#",
+      "#...........######.............#",
+      "#......................H.......#",
+      "#...................######.....#",
+      "#..........A A A...............#",
+      "#..............................#",
+      "#....B.........................#",
+      "#..S.......................D...#",
+      "################################",
+      "#..............................#",
+      "#..............................#",
+      "#..............................#",
+      "#..............................#",
+      "#..............................#",
+      "#..............................#",
+      "################################",
+    ],
+    [
+      "################################",
+      "#..............................#",
+      "#........H.....................#",
+      "#.......####...................#",
+      "#..............................#",
+      "#...........A A A..............#",
+      "#..............................#",
+      "#......................H.......#",
+      "#.................####.........#",
+      "#..S........B............ ..D..#",
+      "################################",
+      "#..............................#",
+      "#..............................#",
+      "#..............................#",
+      "#..............................#",
+      "#..............................#",
+      "#..............................#",
+      "################################",
+    ],
+    [
+      "################################",
+      "#..............................#",
+      "#.............H................#",
+      "#...........######.............#",
+      "#..............................#",
+      "#....B.........A A A...........#",
+      "#..............................#",
+      "#......................H.......#",
+      "#...................######.....#",
+      "#..S.......................D...#",
+      "################################",
+      "#..............................#",
+      "#..............................#",
+      "#..............................#",
+      "#..............................#",
+      "#..............................#",
+      "#..............................#",
+      "################################",
+    ],
   ];
 
   let levelIndex = 0;
@@ -398,16 +497,17 @@
   let needHearts = 0;
   let gotHearts = 0;
 
-  const keys = { left:false, right:false, jump:false };
+  // controls
+  const keys = { left:false, right:false, jumpHeld:false, jumpPressed:false };
 
   // touch buttons
   const leftBtn = document.getElementById("left");
   const rightBtn = document.getElementById("right");
   const jumpBtn = document.getElementById("jump");
 
-  function hold(btn, onDown, onUp){
-    const start = (e)=>{ e.preventDefault(); onDown(); };
-    const end = (e)=>{ e.preventDefault(); onUp(); };
+  function hold(btn, down, up){
+    const start = (e)=>{ e.preventDefault(); down(); };
+    const end = (e)=>{ e.preventDefault(); up(); };
     btn.addEventListener("pointerdown", start);
     btn.addEventListener("pointerup", end);
     btn.addEventListener("pointercancel", end);
@@ -415,19 +515,27 @@
   }
   hold(leftBtn, ()=>keys.left=true, ()=>keys.left=false);
   hold(rightBtn, ()=>keys.right=true, ()=>keys.right=false);
-  // jump: tek basış gibi
-  jumpBtn.addEventListener("pointerdown", (e)=>{ e.preventDefault(); keys.jump=true; });
+  hold(jumpBtn, ()=>{
+    keys.jumpHeld = true;
+    keys.jumpPressed = true; // first frame trigger
+  }, ()=>{
+    keys.jumpHeld = false;
+  });
 
   // keyboard
   window.addEventListener("keydown", (e)=>{
     if(e.key==="ArrowLeft") keys.left=true;
     if(e.key==="ArrowRight") keys.right=true;
-    if(e.key===" " || e.key==="ArrowUp") keys.jump=true;
+    if(e.key===" " || e.key==="ArrowUp"){
+      if(!keys.jumpHeld) keys.jumpPressed = true;
+      keys.jumpHeld = true;
+    }
     if(e.key.toLowerCase()==="r") loadLevel(levelIndex);
   });
   window.addEventListener("keyup", (e)=>{
     if(e.key==="ArrowLeft") keys.left=false;
     if(e.key==="ArrowRight") keys.right=false;
+    if(e.key===" " || e.key==="ArrowUp") keys.jumpHeld=false;
   });
 
   // UI
@@ -449,7 +557,9 @@
     x: 0, y: 0, w: 18, h: 22,
     vx: 0, vy: 0,
     onGround:false,
-    alive:true
+    alive:true,
+    coyote:0,
+    jumpBoost:0
   };
 
   function parseLevel(lines){
@@ -474,12 +584,22 @@
   function loadLevel(i){
     levelIndex = i;
     lvlEl.textContent = (levelIndex+1);
-    msgEl.textContent = messages[levelIndex % messages.length];
+    msgEl.textContent = messages[levelIndex] || "Elif’im… geçilebilir yaptım, sakin sakin 😄💗";
+
+    hintEl.textContent = (levelIndex <= 1)
+      ? "İpucu: Kalpleri topla 💗 → kapıya git 🚪 (çok kolay 😄)"
+      : (levelIndex <= 3)
+        ? "İpucu: Yeşil asit (A) öldürür. Üstünden zıpla 🧸"
+        : (levelIndex <= 5)
+          ? "İpucu: Sarı B = zıplama taşı. Daha yükseğe çıkar ✨"
+          : "İpucu: Kalpleri tamamla, kapı açılır 💗";
 
     parseLevel(LEVELS[levelIndex]);
     player.vx = player.vy = 0;
     player.onGround = false;
     player.alive = true;
+    player.coyote = 0;
+    player.jumpBoost = 0;
   }
 
   function tileAt(px, py){
@@ -540,10 +660,10 @@
 
     if(ch==="A"){ player.alive=false; return; }
 
-    // bounce tile (B) => stronger jump when touching from above
     if(ch==="B" && player.onGround){
-      player.vy = -10.2;
+      player.vy = -11.2; // güçlü zıplama taşı
       player.onGround = false;
+      player.jumpBoost = 6; // kısa süre ekstra yükseltme
     }
 
     if(ch==="H"){
@@ -553,7 +673,6 @@
     }
 
     if(ch==="D"){
-      // win condition: all hearts collected
       if(gotHearts >= needHearts){
         if(levelIndex < LEVELS.length-1) loadLevel(levelIndex+1);
         else msgEl.textContent = "Bitti 😄 Elif’im’e kocaman sarılma ödülü 💗";
@@ -563,29 +682,67 @@
     }
   }
 
+  function drawWallpaper(){
+    const w = wallpapers[levelIndex % wallpapers.length];
+    const g = ctx.createLinearGradient(0,0,960,540);
+    g.addColorStop(0, w[0]);
+    g.addColorStop(0.5, w[1]);
+    g.addColorStop(1, w[2]);
+    ctx.fillStyle = g;
+    ctx.fillRect(0,0,960,540);
+
+    // küçük parıltı noktaları (tatlı doku)
+    ctx.fillStyle = "#ffffff12";
+    for(let i=0;i<24;i++){
+      const x = (i*43 + levelIndex*17) % 960;
+      const y = (i*29 + levelIndex*31) % 540;
+      ctx.beginPath();
+      ctx.arc(x, y, 1.6, 0, Math.PI*2);
+      ctx.fill();
+    }
+  }
+
   function step(){
     if(!player.alive){
       draw();
-      // mini auto restart vibe
-      return requestAnimationFrame(step);
+      requestAnimationFrame(step);
+      return;
     }
 
-    const speed = 2.35;
-    const gravity = 0.36;
-    const jumpV = 7.4;
+    // Daha kontrollü fizik
+    const speed = 1.85;        // hız düşürüldü ✅
+    const gravity = 0.31;      // daha “yumuşak” ✅
+    const jumpV = 9.2;         // daha yüksek zıplama ✅
+    const maxFall = 10;
+
+    // coyote time: zeminden ayrıldıktan sonra 6 frame zıplama hakkı
+    if(player.onGround) player.coyote = 6;
+    else player.coyote = Math.max(0, player.coyote - 1);
 
     player.vx = 0;
     if(keys.left) player.vx = -speed;
     if(keys.right) player.vx = speed;
 
-    if(keys.jump && player.onGround){
+    // zıplama başlatma (jumpPressed veya coyote)
+    if(keys.jumpPressed && player.coyote > 0){
       player.vy = -jumpV;
       player.onGround = false;
+      player.coyote = 0;
+      player.jumpBoost = 10; // basılı tutunca ekstra yükseltme başlayacak
     }
-    keys.jump = false; // one-tap jump
+
+    keys.jumpPressed = false;
+
+    // basılı tutarak daha yüksek zıplama (jumpBoost frames)
+    if(keys.jumpHeld && player.jumpBoost > 0){
+      player.vy -= 0.22;
+      player.jumpBoost--;
+    } else {
+      player.jumpBoost = Math.max(0, player.jumpBoost - 1);
+    }
 
     player.vy += gravity;
-    player.vy = Math.min(player.vy, 9);
+    player.vy = Math.min(player.vy, maxFall);
 
     player.x += player.vx; collide("x");
     player.y += player.vy;
@@ -598,8 +755,8 @@
   }
 
   function draw(){
-    // clear
-    ctx.clearRect(0,0,960,540);
+    // background wallpaper per level ✅
+    drawWallpaper();
 
     // tiles
     for(let y=0;y<ROWS;y++){
@@ -608,26 +765,24 @@
         if(ch==="." ) continue;
 
         if(ch==="#"){
-          ctx.fillStyle = COLORS.wall;
+          ctx.fillStyle = colors.wall;
           ctx.fillRect(x*TILE, y*TILE, TILE, TILE);
         }
         if(ch==="A"){
-          ctx.fillStyle = COLORS.acid;
+          ctx.fillStyle = colors.acid;
           ctx.fillRect(x*TILE, y*TILE, TILE, TILE);
-          // little bubbles
           ctx.fillStyle = "#ffffff55";
           ctx.beginPath(); ctx.arc(x*TILE+10, y*TILE+12, 3, 0, Math.PI*2); ctx.fill();
           ctx.beginPath(); ctx.arc(x*TILE+18, y*TILE+18, 2, 0, Math.PI*2); ctx.fill();
         }
         if(ch==="B"){
-          ctx.fillStyle = COLORS.bounce;
+          ctx.fillStyle = colors.bounce;
           ctx.fillRect(x*TILE, y*TILE, TILE, TILE);
           ctx.fillStyle = "#2b1d0088";
           ctx.fillRect(x*TILE+6, y*TILE+8, TILE-12, 4);
         }
         if(ch==="H"){
-          // heart
-          ctx.fillStyle = COLORS.heart;
+          ctx.fillStyle = colors.heart;
           const cx = x*TILE + 15, cy = y*TILE + 15;
           ctx.beginPath();
           ctx.moveTo(cx, cy+6);
@@ -636,28 +791,21 @@
           ctx.fill();
         }
         if(ch==="D"){
-          ctx.fillStyle = COLORS.door;
+          ctx.fillStyle = colors.door;
           ctx.fillRect(x*TILE+6, y*TILE+4, TILE-12, TILE-8);
-          // lock glow if not all hearts
-          if(gotHearts < needHearts){
-            ctx.fillStyle = "#ffffff55";
-            ctx.fillRect(x*TILE+13, y*TILE+16, 4, 6);
-          }else{
-            ctx.fillStyle = "#ffffffaa";
-            ctx.fillRect(x*TILE+13, y*TILE+16, 4, 6);
-          }
+          ctx.fillStyle = (gotHearts < needHearts) ? "#ffffff55" : "#ffffffcc";
+          ctx.fillRect(x*TILE+13, y*TILE+16, 4, 6);
         }
       }
     }
 
     // player (minnoş kedi)
     const pl = player;
-    // body
+
     ctx.fillStyle = "#ffffff";
     ctx.fillRect(pl.x, pl.y, pl.w, pl.h);
 
     // ears
-    ctx.fillStyle = "#ffffff";
     ctx.fillRect(pl.x+1, pl.y-4, 6, 6);
     ctx.fillRect(pl.x+pl.w-7, pl.y-4, 6, 6);
 
@@ -666,18 +814,17 @@
     ctx.fillRect(pl.x+4, pl.y+8, 3, 3);
     ctx.fillRect(pl.x+pl.w-7, pl.y+8, 3, 3);
 
-    // tiny blush
+    // blush
     ctx.fillStyle = "#ff7a9c";
     ctx.fillRect(pl.x+3, pl.y+12, 3, 2);
     ctx.fillRect(pl.x+pl.w-6, pl.y+12, 3, 2);
 
-    // bow (fiyonk)
+    // bow
     ctx.fillStyle = "#ff4d6d";
     ctx.fillRect(pl.x+pl.w-8, pl.y-2, 3, 3);
     ctx.fillRect(pl.x+pl.w-5, pl.y-3, 3, 3);
     ctx.fillRect(pl.x+pl.w-5, pl.y, 3, 3);
 
-    // game over overlay
     if(!pl.alive){
       ctx.fillStyle = "#000000aa";
       ctx.fillRect(0,0,960,540);
@@ -690,6 +837,10 @@
     }
   }
 
+  // init
+  parseLevel(LEVELS[0]);
+  needEl.textContent = needHearts;
+  heartsEl.textContent = gotHearts;
   loadLevel(0);
   step();
 })();
