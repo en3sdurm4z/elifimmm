@@ -2,26 +2,39 @@
 <html lang="tr">
 <head>
   <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Ateş & Su — Elif’im Edition 🧸</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <title>Elif’im — Minoş Kedi Macerası 🧸💗</title>
   <style>
-    :root{ --bg:#07060c; --fg:#f5f2ff; --mut:#cfc6ea; }
+    :root{
+      --bg0:#07060c; --bg1:#120b18;
+      --text:#f5f2ff; --muted:#cfc6ea;
+      --accent:#ff4d6d; --accent2:#7b2cff; --accent3:#00d4a1;
+      --glass:#ffffff0a; --stroke:#ffffff14; --shadow:0 40px 160px #000000aa;
+      --r:22px;
+    }
+    *{box-sizing:border-box}
+    html,body{height:100%}
     body{
-      margin:0; min-height:100vh;
+      margin:0;
       font-family: ui-rounded, system-ui, -apple-system, "Segoe UI", Arial;
-      background: radial-gradient(1000px 700px at 15% 0%, #ff4d6d33, transparent 60%),
-                  radial-gradient(900px 650px at 105% 10%, #7b2cff33, transparent 60%),
-                  linear-gradient(180deg, #06050b, #120b18);
-      color:var(--fg);
-      display:grid; place-items:center;
-      padding:16px;
+      background:
+        radial-gradient(1100px 700px at 10% -10%, #ff4d6d40, transparent 60%),
+        radial-gradient(900px 650px at 110% 10%, #7b2cff40, transparent 60%),
+        radial-gradient(900px 650px at 50% 120%, #00d4a140, transparent 60%),
+        linear-gradient(180deg, var(--bg0), var(--bg1));
+      color:var(--text);
+      display:grid;
+      place-items:center;
+      padding: max(12px, env(safe-area-inset-top)) 12px max(12px, env(safe-area-inset-bottom));
+      overflow:hidden;
+      touch-action:none;
     }
     .wrap{
-      width:min(980px, 96vw);
-      background:#ffffff0a;
-      border:1px solid #ffffff18;
-      border-radius:22px;
-      box-shadow: 0 40px 160px #000000aa;
+      width:min(1100px, 98vw);
+      background:var(--glass);
+      border:1px solid var(--stroke);
+      border-radius:var(--r);
+      box-shadow:var(--shadow);
       overflow:hidden;
     }
     header{
@@ -30,34 +43,45 @@
       background:#0b0710cc;
       border-bottom:1px solid #ffffff10;
     }
-    .title{
-      display:flex; flex-direction:column; gap:3px;
+    .brand{display:flex; gap:10px; align-items:center; min-width:0}
+    .badge{
+      width:36px; height:36px; border-radius:14px;
+      display:grid; place-items:center;
+      background: linear-gradient(135deg, var(--accent), var(--accent2));
+      border:1px solid #ffffff22;
+      box-shadow:0 14px 34px #ff4d6d22;
+      user-select:none;
     }
-    .title b{ font-size:14px; letter-spacing:.2px; }
-    .title span{ color:var(--mut); font-weight:800; font-size:12px; }
+    .title{display:flex; flex-direction:column; gap:3px; min-width:0}
+    .title b{font-size:14px; font-weight:950; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;}
+    .title span{color:var(--muted); font-weight:800; font-size:12px}
     .pill{
-      display:inline-flex; gap:8px; align-items:center;
+      display:inline-flex; align-items:center; gap:10px;
       padding:8px 10px; border-radius:999px;
       background:#ffffff0c; border:1px solid #ffffff14;
-      color:#ffffffd0; font-weight:900; font-size:12px;
+      color:#ffffffd0; font-weight:950; font-size:12px;
       white-space:nowrap;
     }
+
     .row{
       display:grid;
-      grid-template-columns: 1fr 320px;
-      gap:0;
+      grid-template-columns: 1fr 330px;
+      min-height:560px;
     }
-    @media (max-width: 900px){
-      .row{ grid-template-columns: 1fr; }
+    @media (max-width: 950px){
+      .row{grid-template-columns:1fr}
     }
-    canvas{ width:100%; height:auto; display:block; background:#05040a; }
+
+    .gameArea{position:relative; background:#05040a;}
+    canvas{display:block; width:100%; height:auto; background:#05040a;}
+
     aside{
       padding:14px;
       border-left:1px solid #ffffff10;
       background:#0b07106e;
     }
-    @media (max-width: 900px){
-      aside{ border-left:0; border-top:1px solid #ffffff10; }
+    @media (max-width: 950px){
+      aside{border-left:0; border-top:1px solid #ffffff10}
     }
     .box{
       background:#ffffff0a;
@@ -66,75 +90,139 @@
       padding:12px;
       margin-bottom:12px;
     }
-    .box h3{ margin:0 0 8px; font-size:13px; font-weight:950; }
-    .box p{ margin:0; color:var(--mut); font-weight:800; font-size:12.5px; line-height:1.4; }
-    .btns{ display:flex; gap:10px; flex-wrap:wrap; margin-top:10px; }
+    .box h3{margin:0 0 8px; font-size:13px; font-weight:950}
+    .box p{margin:0; color:var(--muted); font-weight:800; font-size:12.5px; line-height:1.45}
+
+    .btns{display:flex; gap:10px; flex-wrap:wrap; margin-top:10px}
     button{
       appearance:none; border:0; cursor:pointer;
-      color:white; font-weight:950;
-      padding:10px 12px;
-      border-radius:14px;
-      background: linear-gradient(135deg, #ff4d6d, #ff7a9c);
-      box-shadow: 0 16px 40px #ff4d6d25;
+      color:#fff; font-weight:950;
+      padding:10px 12px; border-radius:14px;
+      background: linear-gradient(135deg, var(--accent), #ff7a9c);
+      box-shadow:0 16px 42px #ff4d6d25;
       transition:.12s ease;
     }
-    button:hover{ transform:translateY(-1px); filter:brightness(1.05); }
-    button:active{ transform:translateY(1px); }
-    .b2{ background: linear-gradient(135deg, #7b2cff, #b08cff); box-shadow:0 16px 40px #7b2cff22; }
-    .b3{ background: linear-gradient(135deg, #00d4a1, #7fffe0); color:#062015; box-shadow:0 16px 40px #00d4a122; }
-    .small{ font-size:11px; opacity:.9; }
-    .legend{
-      display:grid; grid-template-columns: 1fr 1fr;
-      gap:10px; margin-top:10px;
+    button:hover{transform:translateY(-1px); filter:brightness(1.05)}
+    button:active{transform:translateY(1px)}
+    .b2{background:linear-gradient(135deg, var(--accent2), #b08cff); box-shadow:0 16px 42px #7b2cff22}
+    .b3{background:linear-gradient(135deg, var(--accent3), #7fffe0); color:#062015; box-shadow:0 16px 42px #00d4a122}
+    .ghost{background:#ffffff10 !important; border:1px solid #ffffff18 !important; box-shadow:none !important}
+
+    .mini{
+      margin-top:10px;
+      border-radius:16px;
+      background:linear-gradient(135deg, #ffffff0f, #ff4d6d10);
+      border:1px solid #ffffff14;
+      padding:10px;
+      color:#ffffffdd;
+      font-weight:850;
+      font-size:12.5px;
+      line-height:1.35;
     }
-    .lg{ display:flex; align-items:center; gap:8px; font-weight:900; font-size:12px; color:#ffffffd0; }
-    .sq{ width:14px; height:14px; border-radius:4px; border:1px solid #ffffff22; }
+
+    /* Touch controls */
+    .touch{position:absolute; inset:0; pointer-events:none;}
+    .pad{
+      position:absolute; bottom:12px;
+      display:flex; gap:10px; align-items:flex-end;
+      pointer-events:auto; user-select:none;
+    }
+    .pad.left{left:12px}
+    .pad.right{right:12px}
+    .cluster{
+      display:flex; gap:10px; align-items:flex-end;
+      padding:10px;
+      border-radius:18px;
+      background:#00000055;
+      border:1px solid #ffffff18;
+      backdrop-filter: blur(10px);
+    }
+    .tbtn{
+      width:58px; height:58px;
+      border-radius:18px;
+      border:1px solid #ffffff18;
+      background:#ffffff10;
+      color:#fff;
+      font-weight:950;
+      font-size:16px;
+      display:grid; place-items:center;
+      box-shadow: 0 18px 60px #00000055;
+      touch-action:none;
+    }
+    .tbtn:active{transform:translateY(1px); filter:brightness(1.07)}
+    .tbtn.main{background:linear-gradient(135deg, #ff4d6d55, #7b2cff55)}
+    .hint{
+      position:absolute; top:10px; left:10px; right:10px;
+      text-align:center;
+      color:#ffffffc7;
+      font-weight:900;
+      font-size:12px;
+      text-shadow: 0 12px 28px #000;
+      pointer-events:none;
+      display:none;
+    }
+    @media (max-width: 950px){ .hint{display:block} }
   </style>
 </head>
+
 <body>
   <div class="wrap">
     <header>
-      <div class="title">
-        <b>🔥 Ateş & 💧 Su — Elif’im Edition 🧸</b>
-        <span>WASD (Su) • Ok tuşları (Ateş) • R: Bölüm sıfırla</span>
+      <div class="brand">
+        <div class="badge">🧸</div>
+        <div class="title">
+          <b>Elif’im için: Minoş Kedi Macerası 💗</b>
+          <span>Mobil: dokun • PC: ← → + Space • R: sıfırla</span>
+        </div>
       </div>
-      <div class="pill">Bölüm: <span id="lvl">1</span>/50 • Elmas: <span id="gems">0</span></div>
+      <div class="pill">Bölüm <span id="lvl">1</span> • Kalp <span id="hearts">0</span>/<span id="need">0</span></div>
     </header>
 
     <div class="row">
-      <canvas id="c" width="960" height="540"></canvas>
+      <div class="gameArea">
+        <div class="hint">İpucu: Soldaki tuşlar ile hareket et, 💗 kalpleri topla, 🚪 kapıya git.</div>
+        <canvas id="c" width="960" height="540"></canvas>
+
+        <div class="touch" aria-hidden="true">
+          <div class="pad left">
+            <div class="cluster">
+              <button class="tbtn" id="left">◀</button>
+              <button class="tbtn" id="right">▶</button>
+            </div>
+          </div>
+          <div class="pad right">
+            <div class="cluster">
+              <button class="tbtn main" id="jump">⤒</button>
+              <button class="tbtn" id="reset">R</button>
+            </div>
+          </div>
+        </div>
+      </div>
 
       <aside>
         <div class="box">
-          <h3>🎮 Amaç</h3>
+          <h3>🎯 Nasıl oynanır</h3>
           <p>
-            İki karakter de kendi kapısına ulaşsın. <br/>
-            💧 Su, 🔥 lavaya girmez. 🔥 Ateş, 💧 suya girmez. <br/>
-            🟩 Asit ikisini de yakar.
+            🧸 Minoş Kedi’yi yönet. <br/>
+            💗 Kalpleri topla, 🚪 kapıdan çık. <br/>
+            🟩 Asit = oyun biter. 🟨 Zeminlerde zıpla zıpla 😄
           </p>
-
-          <div class="legend">
-            <div class="lg"><span class="sq" style="background:#2a2a33"></span> Duvar</div>
-            <div class="lg"><span class="sq" style="background:#0aa3ff"></span> Su</div>
-            <div class="lg"><span class="sq" style="background:#ff4d6d"></span> Lava</div>
-            <div class="lg"><span class="sq" style="background:#00d4a1"></span> Asit</div>
-            <div class="lg"><span class="sq" style="background:#7b2cff"></span> Su elması</div>
-            <div class="lg"><span class="sq" style="background:#ff9f1c"></span> Ateş elması</div>
-          </div>
-
           <div class="btns">
-            <button id="prev" class="b2">⬅ Önceki</button>
+            <button class="b2" id="prev">⬅ Önceki</button>
             <button id="next">Sonraki ➡</button>
-            <button id="reset" class="b3">R: Sıfırla</button>
+            <button class="b3" id="restart">Sıfırla</button>
+            <button class="ghost" id="fs">⛶ Tam ekran</button>
           </div>
-          <p class="small" style="margin-top:10px; color:#ffffffb8; font-weight:800;">
-            Not: İlk 10 bölüm özenli. 11–50 “oynanabilir üretim” (sonra istersek tek tek özel tasarlarız).
-          </p>
+          <div class="mini" id="msg">Elif’im… bu oyun “minnoşluk” testidir. Kaybedersen sarılma cezası var 😄💗</div>
         </div>
 
         <div class="box">
-          <h3>💗 Minnoş mesaj</h3>
-          <p id="msg">Elif’im… takım oyunu gibi: ikimiz de aynı anda kazanıyoruz 😄</p>
+          <h3>🛠 50 bölüm mevzusu</h3>
+          <p>
+            Şu an 15 bölüm hazır. İstersen bunu 50’ye iki şekilde çıkarırız: <br/>
+            1) Hepsini “özel tasarım” <br/>
+            2) 15 özel + geri kalanı aynı mantıkla kaliteli varyasyon
+          </p>
         </div>
       </aside>
     </div>
@@ -144,245 +232,255 @@
 (() => {
   const canvas = document.getElementById("c");
   const ctx = canvas.getContext("2d");
+
   const lvlEl = document.getElementById("lvl");
-  const gemsEl = document.getElementById("gems");
+  const heartsEl = document.getElementById("hearts");
+  const needEl = document.getElementById("need");
   const msgEl = document.getElementById("msg");
 
-  // Tiles:
-  // # wall, . empty, W water, L lava, A acid
-  // s water gem, f fire gem
-  // D water door, F fire door
-  // p water spawn, q fire spawn
-  const TILE = 30;
-  const COLS = Math.floor(canvas.width / TILE);  // 32
-  const ROWS = Math.floor(canvas.height / TILE); // 18
+  // hiDPI
+  function fitCanvas(){
+    const cssW = canvas.clientWidth || canvas.parentElement.clientWidth;
+    const aspect = 960/540;
+    const cssH = Math.round(cssW / aspect);
+    canvas.style.height = cssH + "px";
+    const dpr = Math.min(2, window.devicePixelRatio || 1);
+    const w = Math.round(cssW * dpr);
+    const h = Math.round(cssH * dpr);
+    if(canvas.width !== w || canvas.height !== h){
+      canvas.width = w; canvas.height = h;
+    }
+    ctx.setTransform(dpr,0,0,dpr,0,0);
+  }
+  window.addEventListener("resize", fitCanvas, {passive:true});
+  fitCanvas();
 
+  const TILE = 30;
+  const COLS = 32;
+  const ROWS = 18;
+
+  // tiles:
+  // # wall, . empty, S spawn, H heart, D door, A acid, B bouncy
   const COLORS = {
     wall:"#2a2a33",
-    empty:"#05040a",
-    water:"#0aa3ff",
-    lava:"#ff4d6d",
     acid:"#00d4a1",
-    wgem:"#7b2cff",
-    fgem:"#ff9f1c",
-    wdoor:"#7b2cff",
-    fdoor:"#ff4d6d",
+    bounce:"#ffd166",
+    door:"#ff4d6d",
+    heart:"#ff4d6d",
   };
 
-  // --- Level helpers ---
-  function borderRoom(){
-    const g = Array.from({length:ROWS}, () => Array(COLS).fill("."));
+  const messages = [
+    "Elif’im… bu oyun “minnoşluk” testidir. Kaybedersen sarılma cezası var 😄💗",
+    "Kalpleri topla… çünkü Elif’im kalp koleksiyonumun en güzeli 💞",
+    "Bu bölüm biraz zor olabilir… ama Elif’im daha zoru: ‘çok tatlı olmak’ 🧸",
+    "İpucu: Zıplarken panik yok… minnoşça sakin 😌",
+    "Bölüm bittiğinde ödül: Elif’im’in gülüşü (en pahalı loot) ✨",
+  ];
+
+  const LEVELS = [
+    [
+      "################################",
+      "#..............................#",
+      "#..............H...............#",
+      "#..............#...............#",
+      "#..............#...............#",
+      "#......B.......#.......B.......#",
+      "#..............#...............#",
+      "#..........H...#...H...........#",
+      "#..............#...............#",
+      "#..S...........#.............D.#",
+      "#############..#..##############",
+      "#..............................#",
+      "#..............A...............#",
+      "#..............................#",
+      "#..............................#",
+      "#........H.............H.......#",
+      "#..............................#",
+      "################################",
+    ],
+    [
+      "################################",
+      "#..............................#",
+      "#..........H.............H.....#",
+      "#............#######...........#",
+      "#..............................#",
+      "#....B....................B....#",
+      "#.............A................#",
+      "#.............A................#",
+      "#..S..........A.............D..#",
+      "##########....A....#############",
+      "#..............................#",
+      "#..............H...............#",
+      "#..............................#",
+      "#.............####.............#",
+      "#..............................#",
+      "#....H.....................H...#",
+      "#..............................#",
+      "################################",
+    ],
+    [
+      "################################",
+      "#..............................#",
+      "#..H...............H...........#",
+      "#...........####...............#",
+      "#..............................#",
+      "#.....A..................A.....#",
+      "#.....A..................A.....#",
+      "#.....A..................A.....#",
+      "#..S..A......B....B......A..D..#",
+      "######A##################A######",
+      "#..............................#",
+      "#..............H...............#",
+      "#..............................#",
+      "#............######............#",
+      "#..............................#",
+      "#..H.......................H...#",
+      "#..............................#",
+      "################################",
+    ],
+    [
+      "################################",
+      "#..............................#",
+      "#..........H...................#",
+      "#..............#######.........#",
+      "#..............................#",
+      "#...B....................B.....#",
+      "#....................H.........#",
+      "#..............A...............#",
+      "#..S...........A...........D...#",
+      "############...A...#############",
+      "#..............A...............#",
+      "#..............A...............#",
+      "#..............A...............#",
+      "#..............................#",
+      "#....H.....................H...#",
+      "#..............................#",
+      "#..............................#",
+      "################################",
+    ],
+    // 5..15 biraz daha “platform” vari
+    ...Array.from({length:11}, (_,i)=>{
+      const k = i+5;
+      const g = Array.from({length:ROWS}, ()=> Array(COLS).fill("."));
+      for(let y=0;y<ROWS;y++){
+        for(let x=0;x<COLS;x++){
+          if(y===0||y===ROWS-1||x===0||x===COLS-1) g[y][x]="#";
+        }
+      }
+      // platforms
+      const p1 = 4 + (k*3)%10;
+      const p2 = 16 + (k*5)%10;
+      for(let x=p1;x<p1+8;x++) g[10][x]="#";
+      for(let x=p2;x<p2+8;x++) g[7][x]="#";
+      for(let x=6;x<26;x++) g[14][x]="#";
+
+      // hazards
+      for(let x=12;x<20;x++) g[15][x]="A";
+
+      // bouncy tiles
+      g[13][8]="B"; g[13][24]="B";
+
+      // spawn/door
+      g[13][2]="S";
+      g[13][29]="D";
+
+      // hearts
+      g[6][p2+3]="H";
+      g[9][p1+4]="H";
+      g[12][18]="H";
+
+      return g.map(r=> r.join(""));
+    }),
+  ];
+
+  let levelIndex = 0;
+  let grid = [];
+  let needHearts = 0;
+  let gotHearts = 0;
+
+  const keys = { left:false, right:false, jump:false };
+
+  // touch buttons
+  const leftBtn = document.getElementById("left");
+  const rightBtn = document.getElementById("right");
+  const jumpBtn = document.getElementById("jump");
+
+  function hold(btn, onDown, onUp){
+    const start = (e)=>{ e.preventDefault(); onDown(); };
+    const end = (e)=>{ e.preventDefault(); onUp(); };
+    btn.addEventListener("pointerdown", start);
+    btn.addEventListener("pointerup", end);
+    btn.addEventListener("pointercancel", end);
+    btn.addEventListener("pointerleave", end);
+  }
+  hold(leftBtn, ()=>keys.left=true, ()=>keys.left=false);
+  hold(rightBtn, ()=>keys.right=true, ()=>keys.right=false);
+  // jump: tek basış gibi
+  jumpBtn.addEventListener("pointerdown", (e)=>{ e.preventDefault(); keys.jump=true; });
+
+  // keyboard
+  window.addEventListener("keydown", (e)=>{
+    if(e.key==="ArrowLeft") keys.left=true;
+    if(e.key==="ArrowRight") keys.right=true;
+    if(e.key===" " || e.key==="ArrowUp") keys.jump=true;
+    if(e.key.toLowerCase()==="r") loadLevel(levelIndex);
+  });
+  window.addEventListener("keyup", (e)=>{
+    if(e.key==="ArrowLeft") keys.left=false;
+    if(e.key==="ArrowRight") keys.right=false;
+  });
+
+  // UI
+  document.getElementById("prev").addEventListener("click", ()=> loadLevel(Math.max(0, levelIndex-1)));
+  document.getElementById("next").addEventListener("click", ()=> loadLevel(Math.min(LEVELS.length-1, levelIndex+1)));
+  document.getElementById("restart").addEventListener("click", ()=> loadLevel(levelIndex));
+  document.getElementById("reset").addEventListener("click", ()=> loadLevel(levelIndex));
+
+  // fullscreen
+  document.getElementById("fs").addEventListener("click", async ()=>{
+    const el = document.documentElement;
+    try{
+      if(!document.fullscreenElement) await el.requestFullscreen();
+      else await document.exitFullscreen();
+    }catch{}
+  });
+
+  const player = {
+    x: 0, y: 0, w: 18, h: 22,
+    vx: 0, vy: 0,
+    onGround:false,
+    alive:true
+  };
+
+  function parseLevel(lines){
+    grid = lines.map(line=> line.split(""));
+    needHearts = 0; gotHearts = 0;
+
     for(let y=0;y<ROWS;y++){
       for(let x=0;x<COLS;x++){
-        if(y===0||y===ROWS-1||x===0||x===COLS-1) g[y][x]="#";
+        const ch = grid[y][x];
+        if(ch==="H") needHearts++;
+        if(ch==="S"){
+          player.x = x*TILE + 6;
+          player.y = y*TILE + 4;
+          grid[y][x]=".";
+        }
       }
     }
-    return g;
-  }
-  function put(g,x,y,ch){ if(y>=0&&y<ROWS&&x>=0&&x<COLS) g[y][x]=ch; }
-  function rect(g,x0,y0,w,h,ch){
-    for(let y=y0;y<y0+h;y++) for(let x=x0;x<x0+w;x++) put(g,x,y,ch);
-  }
-  function platform(g,x0,y,w){
-    for(let x=x0;x<x0+w;x++) put(g,x,y,"#");
+    needEl.textContent = needHearts;
+    heartsEl.textContent = gotHearts;
   }
 
-  // 10 hand-made-ish levels, remaining generated variations
-  function makeLevels(){
-    const levels = [];
+  function loadLevel(i){
+    levelIndex = i;
+    lvlEl.textContent = (levelIndex+1);
+    msgEl.textContent = messages[levelIndex % messages.length];
 
-    // L1: tutorial
-    {
-      const g = borderRoom();
-      platform(g,2,15,28);
-      platform(g,6,11,6);
-      platform(g,20,11,6);
-      put(g,4,14,"p"); put(g,6,14,"q");
-      put(g,26,14,"D"); put(g,28,14,"F");
-      put(g,8,10,"s"); put(g,22,10,"f");
-      levels.push(g);
-    }
-
-    // L2: hazards intro
-    {
-      const g = borderRoom();
-      platform(g,2,15,28);
-      rect(g,10,16,6,1,"W");
-      rect(g,16,16,6,1,"L");
-      platform(g,4,12,8);
-      platform(g,20,12,8);
-      put(g,4,14,"p"); put(g,6,14,"q");
-      put(g,26,14,"D"); put(g,28,14,"F");
-      put(g,7,11,"s"); put(g,25,11,"f");
-      levels.push(g);
-    }
-
-    // L3: acid in middle
-    {
-      const g = borderRoom();
-      platform(g,2,15,28);
-      rect(g,13,16,6,1,"A");
-      platform(g,4,12,6);
-      platform(g,22,12,6);
-      platform(g,12,10,8);
-      put(g,4,14,"p"); put(g,6,14,"q");
-      put(g,26,14,"D"); put(g,28,14,"F");
-      put(g,8,11,"s"); put(g,24,11,"f");
-      levels.push(g);
-    }
-
-    // L4: split lanes
-    {
-      const g = borderRoom();
-      platform(g,2,15,28);
-      platform(g,2,12,12);
-      platform(g,18,12,12);
-      rect(g,14,16,4,1,"A");
-      rect(g,6,16,6,1,"W");
-      rect(g,20,16,6,1,"L");
-      put(g,4,14,"p"); put(g,6,14,"q");
-      put(g,26,14,"D"); put(g,28,14,"F");
-      put(g,8,11,"s"); put(g,22,11,"f");
-      levels.push(g);
-    }
-
-    // L5: zigzag
-    {
-      const g = borderRoom();
-      platform(g,2,15,28);
-      platform(g,4,13,8);
-      platform(g,20,13,8);
-      platform(g,10,10,12);
-      rect(g,12,16,8,1,"A");
-      put(g,4,14,"p"); put(g,6,14,"q");
-      put(g,26,14,"D"); put(g,28,14,"F");
-      put(g,12,9,"s"); put(g,20,9,"f");
-      levels.push(g);
-    }
-
-    // L6: more hazards
-    {
-      const g = borderRoom();
-      platform(g,2,15,28);
-      platform(g,6,12,20);
-      rect(g,9,16,6,1,"W");
-      rect(g,17,16,6,1,"L");
-      rect(g,14,13,4,1,"A");
-      put(g,4,14,"p"); put(g,6,14,"q");
-      put(g,26,14,"D"); put(g,28,14,"F");
-      put(g,10,11,"s"); put(g,22,11,"f");
-      levels.push(g);
-    }
-
-    // L7: “bridge”
-    {
-      const g = borderRoom();
-      platform(g,2,15,28);
-      platform(g,6,11,20);
-      platform(g,12,8,8);
-      rect(g,12,16,8,1,"A");
-      put(g,4,14,"p"); put(g,6,14,"q");
-      put(g,26,14,"D"); put(g,28,14,"F");
-      put(g,13,7,"s"); put(g,18,7,"f");
-      levels.push(g);
-    }
-
-    // L8: tight jumps
-    {
-      const g = borderRoom();
-      platform(g,2,15,28);
-      platform(g,4,12,6);
-      platform(g,12,10,6);
-      platform(g,20,12,6);
-      rect(g,14,16,4,1,"A");
-      rect(g,8,16,4,1,"W");
-      rect(g,20,16,4,1,"L");
-      put(g,4,14,"p"); put(g,6,14,"q");
-      put(g,26,14,"D"); put(g,28,14,"F");
-      put(g,13,9,"s"); put(g,15,9,"f");
-      levels.push(g);
-    }
-
-    // L9: longer route
-    {
-      const g = borderRoom();
-      platform(g,2,15,28);
-      platform(g,2,12,10);
-      platform(g,20,12,10);
-      platform(g,10,9,12);
-      rect(g,12,16,8,1,"A");
-      put(g,4,14,"p"); put(g,6,14,"q");
-      put(g,26,14,"D"); put(g,28,14,"F");
-      put(g,6,11,"s"); put(g,26,11,"f");
-      levels.push(g);
-    }
-
-    // L10: mix
-    {
-      const g = borderRoom();
-      platform(g,2,15,28);
-      platform(g,6,12,8);
-      platform(g,18,12,8);
-      platform(g,12,9,8);
-      rect(g,10,16,6,1,"W");
-      rect(g,16,16,6,1,"L");
-      rect(g,13,13,6,1,"A");
-      put(g,4,14,"p"); put(g,6,14,"q");
-      put(g,26,14,"D"); put(g,28,14,"F");
-      put(g,12,8,"s"); put(g,19,8,"f");
-      levels.push(g);
-    }
-
-    // Generated levels 11..50
-    for(let i=10;i<50;i++){
-      const g = borderRoom();
-      platform(g,2,15,28);
-
-      // vary platforms
-      const seed = i+1;
-      const p1 = 4 + (seed*3)%10;
-      const p2 = 18 + (seed*5)%8;
-      platform(g, p1, 12, 6);
-      platform(g, p2, 12, 6);
-
-      const midW = 4 + (seed%6);
-      platform(g, 10, 9 + (seed%2), 12);
-
-      // hazards pattern
-      const hz = 10 + (seed%6);
-      rect(g, hz, 16, 5, 1, (seed%3===0)?"A":(seed%2===0)?"W":"L");
-      rect(g, hz+6, 16, 5, 1, (seed%3===1)?"A":(seed%2===0)?"L":"W");
-
-      // spawns & doors
-      put(g, 4,14,"p");
-      put(g, 6,14,"q");
-      put(g, 26,14,"D");
-      put(g, 28,14,"F");
-
-      // gems
-      put(g, p1+2,11,"s");
-      put(g, p2+2,11,"f");
-      levels.push(g);
-    }
-
-    return levels;
+    parseLevel(LEVELS[levelIndex]);
+    player.vx = player.vy = 0;
+    player.onGround = false;
+    player.alive = true;
   }
-
-  const LEVELS = makeLevels();
-
-  // --- Game state ---
-  let levelIndex = 0;
-  let grid, gemsTotal = 0;
-
-  const keys = {};
-  window.addEventListener("keydown", e => {
-    keys[e.key] = true;
-    if(e.key.toLowerCase()==="r") resetLevel();
-  });
-  window.addEventListener("keyup", e => keys[e.key] = false);
-
-  const playerWater = { x:0, y:0, vx:0, vy:0, w:18, h:22, color:"#0aa3ff", type:"water", gems:0, alive:true, onGround:false };
-  const playerFire  = { x:0, y:0, vx:0, vy:0, w:18, h:22, color:"#ff4d6d", type:"fire",  gems:0, alive:true, onGround:false };
 
   function tileAt(px, py){
     const tx = Math.floor(px / TILE);
@@ -390,102 +488,20 @@
     if(ty<0||ty>=ROWS||tx<0||tx>=COLS) return "#";
     return grid[ty][tx];
   }
-  function isSolid(ch){ return ch === "#"; }
-  function isHazard(ch){
-    return ch==="W" || ch==="L" || ch==="A";
-  }
-
-  function findChar(ch){
-    for(let y=0;y<ROWS;y++){
-      for(let x=0;x<COLS;x++){
-        if(grid[y][x]===ch) return {x,y};
-      }
-    }
-    return null;
-  }
-
-  function loadLevel(i){
-    levelIndex = Math.max(0, Math.min(49, i));
-    grid = LEVELS[levelIndex].map(r => r.slice());
-    gemsTotal = 0;
-
-    const p = findChar("p");
-    const q = findChar("q");
-    playerWater.x = (p.x*TILE) + 6; playerWater.y = (p.y*TILE) + 4;
-    playerFire.x  = (q.x*TILE) + 6; playerFire.y  = (q.y*TILE) + 4;
-    playerWater.vx=playerWater.vy=0;
-    playerFire.vx=playerFire.vy=0;
-    playerWater.gems=0; playerFire.gems=0;
-    playerWater.alive=true; playerFire.alive=true;
-
-    // count gems
-    for(let y=0;y<ROWS;y++) for(let x=0;x<COLS;x++){
-      if(grid[y][x]==="s"||grid[y][x]==="f") gemsTotal++;
-    }
-
-    lvlEl.textContent = (levelIndex+1);
-    gemsEl.textContent = "0/" + gemsTotal;
-    msgEl.textContent = pickMsg(levelIndex);
-  }
-
-  function resetLevel(){ loadLevel(levelIndex); }
-
-  function pickMsg(i){
-    const msgs = [
-      "Elif’im… takım oyunu gibi: ikimiz de aynı anda kazanıyoruz 😄",
-      "Minnoş taktik: önce elmas, sonra kapı 💗",
-      "Biri düşerse öbürü de üzülür… dikkat 🧸",
-      "Elif’im gülünce ben +10 güç alıyorum ✨",
-      "Bu bölüm ‘sarılma arası’ gibi: kısa ama tatlı 😌",
-      "Birlikte olunca her bölüm geçilir 💞"
-    ];
-    return msgs[i % msgs.length];
-  }
+  function isSolid(ch){ return ch==="#"; }
 
   function rectVsRect(a,b){
     return a.x < b.x+b.w && a.x+a.w > b.x && a.y < b.y+b.h && a.y+a.h > b.y;
   }
 
-  function movePlayer(pl, left, right, jump){
-    const speed = 2.2;
-    const gravity = 0.35;
-    const jumpV = 7.2;
-
-    pl.vx = 0;
-    if(left) pl.vx = -speed;
-    if(right) pl.vx = speed;
-
-    // jump
-    if(jump && pl.onGround){
-      pl.vy = -jumpV;
-      pl.onGround = false;
-    }
-
-    pl.vy += gravity;
-    pl.vy = Math.min(pl.vy, 9);
-
-    // x move
-    pl.x += pl.vx;
-    collide(pl, "x");
-
-    // y move
-    pl.y += pl.vy;
-    pl.onGround = false;
-    collide(pl, "y");
-
-    // hazards & pickups & doors
-    interact(pl);
-  }
-
-  function collide(pl, axis){
-    // sample four corners
+  function collide(axis){
+    const pl = player;
     const pts = [
       {x: pl.x, y: pl.y},
       {x: pl.x+pl.w, y: pl.y},
       {x: pl.x, y: pl.y+pl.h},
       {x: pl.x+pl.w, y: pl.y+pl.h},
     ];
-
     for(const p of pts){
       const ch = tileAt(p.x, p.y);
       if(isSolid(ch)){
@@ -515,161 +531,167 @@
     }
   }
 
-  function interact(pl){
-    // center point
-    const cx = pl.x + pl.w/2;
-    const cy = pl.y + pl.h/2;
+  function interact(){
+    const cx = player.x + player.w/2;
+    const cy = player.y + player.h/2;
     const tx = Math.floor(cx / TILE);
     const ty = Math.floor(cy / TILE);
     const ch = grid[ty]?.[tx];
 
-    // hazards
-    if(ch==="W" && pl.type==="fire") die();
-    if(ch==="L" && pl.type==="water") die();
-    if(ch==="A") die();
+    if(ch==="A"){ player.alive=false; return; }
 
-    // gems
-    if(ch==="s" && pl.type==="water"){ grid[ty][tx]="."; pl.gems++; }
-    if(ch==="f" && pl.type==="fire"){ grid[ty][tx]="."; pl.gems++; }
-
-    const total = playerWater.gems + playerFire.gems;
-    gemsEl.textContent = total + "/" + gemsTotal;
-
-    function die(){
-      playerWater.alive=false; playerFire.alive=false;
-    }
-  }
-
-  function reachedDoor(pl){
-    const cx = pl.x + pl.w/2;
-    const cy = pl.y + pl.h/2;
-    const tx = Math.floor(cx / TILE);
-    const ty = Math.floor(cy / TILE);
-    const ch = grid[ty]?.[tx];
-    return (pl.type==="water" && ch==="D") || (pl.type==="fire" && ch==="F");
-  }
-
-  function update(){
-    // controls
-    if(playerWater.alive){
-      movePlayer(
-        playerWater,
-        keys["a"]||keys["A"],
-        keys["d"]||keys["D"],
-        keys["w"]||keys["W"]
-      );
-    }
-    if(playerFire.alive){
-      movePlayer(
-        playerFire,
-        keys["ArrowLeft"],
-        keys["ArrowRight"],
-        keys["ArrowUp"]
-      );
+    // bounce tile (B) => stronger jump when touching from above
+    if(ch==="B" && player.onGround){
+      player.vy = -10.2;
+      player.onGround = false;
     }
 
-    // fail
-    if(!playerWater.alive || !playerFire.alive){
-      // restart after short delay vibe
-      // (simple: show text, wait input R or click reset)
+    if(ch==="H"){
+      grid[ty][tx]=".";
+      gotHearts++;
+      heartsEl.textContent = gotHearts;
     }
 
-    // win
-    const win = reachedDoor(playerWater) && reachedDoor(playerFire);
-    if(win){
-      if(levelIndex < 49) loadLevel(levelIndex+1);
-      else {
-        // finished
-        msgEl.textContent = "Bitti 🥹 50/50… Elif’im’le her şey tamam 💗";
+    if(ch==="D"){
+      // win condition: all hearts collected
+      if(gotHearts >= needHearts){
+        if(levelIndex < LEVELS.length-1) loadLevel(levelIndex+1);
+        else msgEl.textContent = "Bitti 😄 Elif’im’e kocaman sarılma ödülü 💗";
+      }else{
+        msgEl.textContent = "Kapı açılmadı 😄 Önce kalpler 💗";
       }
     }
+  }
 
+  function step(){
+    if(!player.alive){
+      draw();
+      // mini auto restart vibe
+      return requestAnimationFrame(step);
+    }
+
+    const speed = 2.35;
+    const gravity = 0.36;
+    const jumpV = 7.4;
+
+    player.vx = 0;
+    if(keys.left) player.vx = -speed;
+    if(keys.right) player.vx = speed;
+
+    if(keys.jump && player.onGround){
+      player.vy = -jumpV;
+      player.onGround = false;
+    }
+    keys.jump = false; // one-tap jump
+
+    player.vy += gravity;
+    player.vy = Math.min(player.vy, 9);
+
+    player.x += player.vx; collide("x");
+    player.y += player.vy;
+    player.onGround = false;
+    collide("y");
+
+    interact();
     draw();
-    requestAnimationFrame(update);
+    requestAnimationFrame(step);
   }
 
   function draw(){
     // clear
-    ctx.clearRect(0,0,canvas.width,canvas.height);
+    ctx.clearRect(0,0,960,540);
 
     // tiles
     for(let y=0;y<ROWS;y++){
       for(let x=0;x<COLS;x++){
         const ch = grid[y][x];
-        if(ch === ".") continue;
+        if(ch==="." ) continue;
 
-        let color = null;
-        if(ch==="#") color = COLORS.wall;
-        if(ch==="W") color = COLORS.water;
-        if(ch==="L") color = COLORS.lava;
-        if(ch==="A") color = COLORS.acid;
-
-        if(color){
-          ctx.fillStyle = color;
+        if(ch==="#"){
+          ctx.fillStyle = COLORS.wall;
           ctx.fillRect(x*TILE, y*TILE, TILE, TILE);
-          continue;
         }
-
-        // gems / doors / spawns (render simple)
-        if(ch==="s"){
-          ctx.fillStyle = COLORS.wgem;
-          ctx.beginPath();
-          ctx.arc(x*TILE+TILE/2, y*TILE+TILE/2, 6, 0, Math.PI*2);
-          ctx.fill();
+        if(ch==="A"){
+          ctx.fillStyle = COLORS.acid;
+          ctx.fillRect(x*TILE, y*TILE, TILE, TILE);
+          // little bubbles
+          ctx.fillStyle = "#ffffff55";
+          ctx.beginPath(); ctx.arc(x*TILE+10, y*TILE+12, 3, 0, Math.PI*2); ctx.fill();
+          ctx.beginPath(); ctx.arc(x*TILE+18, y*TILE+18, 2, 0, Math.PI*2); ctx.fill();
         }
-        if(ch==="f"){
-          ctx.fillStyle = COLORS.fgem;
+        if(ch==="B"){
+          ctx.fillStyle = COLORS.bounce;
+          ctx.fillRect(x*TILE, y*TILE, TILE, TILE);
+          ctx.fillStyle = "#2b1d0088";
+          ctx.fillRect(x*TILE+6, y*TILE+8, TILE-12, 4);
+        }
+        if(ch==="H"){
+          // heart
+          ctx.fillStyle = COLORS.heart;
+          const cx = x*TILE + 15, cy = y*TILE + 15;
           ctx.beginPath();
-          ctx.arc(x*TILE+TILE/2, y*TILE+TILE/2, 6, 0, Math.PI*2);
+          ctx.moveTo(cx, cy+6);
+          ctx.bezierCurveTo(cx-10, cy-2, cx-10, cy+12, cx, cy+14);
+          ctx.bezierCurveTo(cx+10, cy+12, cx+10, cy-2, cx, cy+6);
           ctx.fill();
         }
         if(ch==="D"){
-          ctx.fillStyle = COLORS.wdoor;
+          ctx.fillStyle = COLORS.door;
           ctx.fillRect(x*TILE+6, y*TILE+4, TILE-12, TILE-8);
-        }
-        if(ch==="F"){
-          ctx.fillStyle = COLORS.fdoor;
-          ctx.fillRect(x*TILE+6, y*TILE+4, TILE-12, TILE-8);
+          // lock glow if not all hearts
+          if(gotHearts < needHearts){
+            ctx.fillStyle = "#ffffff55";
+            ctx.fillRect(x*TILE+13, y*TILE+16, 4, 6);
+          }else{
+            ctx.fillStyle = "#ffffffaa";
+            ctx.fillRect(x*TILE+13, y*TILE+16, 4, 6);
+          }
         }
       }
     }
 
-    // players
-    drawPlayer(playerWater);
-    drawPlayer(playerFire);
+    // player (minnoş kedi)
+    const pl = player;
+    // body
+    ctx.fillStyle = "#ffffff";
+    ctx.fillRect(pl.x, pl.y, pl.w, pl.h);
 
-    // overlays
-    if(!playerWater.alive || !playerFire.alive){
+    // ears
+    ctx.fillStyle = "#ffffff";
+    ctx.fillRect(pl.x+1, pl.y-4, 6, 6);
+    ctx.fillRect(pl.x+pl.w-7, pl.y-4, 6, 6);
+
+    // eyes
+    ctx.fillStyle = "#111";
+    ctx.fillRect(pl.x+4, pl.y+8, 3, 3);
+    ctx.fillRect(pl.x+pl.w-7, pl.y+8, 3, 3);
+
+    // tiny blush
+    ctx.fillStyle = "#ff7a9c";
+    ctx.fillRect(pl.x+3, pl.y+12, 3, 2);
+    ctx.fillRect(pl.x+pl.w-6, pl.y+12, 3, 2);
+
+    // bow (fiyonk)
+    ctx.fillStyle = "#ff4d6d";
+    ctx.fillRect(pl.x+pl.w-8, pl.y-2, 3, 3);
+    ctx.fillRect(pl.x+pl.w-5, pl.y-3, 3, 3);
+    ctx.fillRect(pl.x+pl.w-5, pl.y, 3, 3);
+
+    // game over overlay
+    if(!pl.alive){
       ctx.fillStyle = "#000000aa";
-      ctx.fillRect(0,0,canvas.width,canvas.height);
+      ctx.fillRect(0,0,960,540);
       ctx.fillStyle = "#ffffff";
       ctx.font = "900 22px ui-rounded, system-ui";
-      ctx.fillText("Oops… yanma oldu 😄", 24, 60);
+      ctx.fillText("Ayy 😄 Asit oldu…", 24, 60);
       ctx.font = "800 14px ui-rounded, system-ui";
       ctx.fillStyle = "#ffffffcc";
-      ctx.fillText("R’ye bas veya sağdan Sıfırla’ya tıkla.", 24, 88);
+      ctx.fillText("Sıfırla’ya bas (ya da R). Elif’im üzülmesin 🧸💗", 24, 88);
     }
   }
 
-  function drawPlayer(pl){
-    ctx.save();
-    ctx.fillStyle = pl.color;
-    ctx.fillRect(pl.x, pl.y, pl.w, pl.h);
-    // little face dot
-    ctx.fillStyle = "#ffffffcc";
-    ctx.fillRect(pl.x+5, pl.y+7, 3, 3);
-    ctx.fillRect(pl.x+pl.w-8, pl.y+7, 3, 3);
-    ctx.restore();
-  }
-
-  // UI buttons
-  document.getElementById("prev").addEventListener("click", ()=> loadLevel(Math.max(0, levelIndex-1)));
-  document.getElementById("next").addEventListener("click", ()=> loadLevel(Math.min(49, levelIndex+1)));
-  document.getElementById("reset").addEventListener("click", resetLevel);
-
-  // start
   loadLevel(0);
-  update();
+  step();
 })();
 </script>
 </body>
