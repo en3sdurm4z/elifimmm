@@ -79,25 +79,34 @@
       .row{grid-template-columns:1fr}
     }
 
-    /* ✅ OYUN ALANI: canvas üstte, tuş barı altta (gerçekten ayrı alan) */
-    .gameArea{
-      position:relative;
-      background:#05040a;
-      border-right:1px solid #ffffff10;
-      overflow:hidden;
+/* ✅ OYUN ALANI */
+.gameArea{
+  position:relative;
+  background:#05040a;
+  border-right:1px solid #ffffff10;
+  overflow:hidden;
 
-      display:grid;
-      grid-template-rows: 1fr var(--padH);
-      min-height: 520px;
-    }
-    @media (max-width: 950px){
-      :root{ --padH: 120px; }
-      .gameArea{
-        border-right:0;
-        border-bottom:1px solid #ffffff10;
-        min-height: min(68vh, 620px);
-      }
-    }
+  display:grid;
+  grid-template-rows: 1fr var(--padH);
+  min-height: 520px;
+}
+
+/* ✅ Küçük ekran (telefon/tablet) */
+@media (max-width: 950px){
+  :root{ --padH: 120px; }
+  .gameArea{
+    border-right:0;
+    border-bottom:1px solid #ffffff10;
+    min-height: min(68vh, 620px);
+  }
+  .touchBar{ display:flex; } /* istersen kalsın */
+}
+
+/* ✅ Dokunmatik cihazlarda (genişlik ne olursa olsun) tuşları göster */
+@media (hover: none) and (pointer: coarse) {
+  :root{ --padH: 120px; }
+  .touchBar{ display:flex; }
+}
 
     canvas{
       width:100%;
