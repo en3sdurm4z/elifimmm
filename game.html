@@ -1,0 +1,676 @@
+<!doctype html>
+<html lang="tr">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Ateş & Su — Elif’im Edition 🧸</title>
+  <style>
+    :root{ --bg:#07060c; --fg:#f5f2ff; --mut:#cfc6ea; }
+    body{
+      margin:0; min-height:100vh;
+      font-family: ui-rounded, system-ui, -apple-system, "Segoe UI", Arial;
+      background: radial-gradient(1000px 700px at 15% 0%, #ff4d6d33, transparent 60%),
+                  radial-gradient(900px 650px at 105% 10%, #7b2cff33, transparent 60%),
+                  linear-gradient(180deg, #06050b, #120b18);
+      color:var(--fg);
+      display:grid; place-items:center;
+      padding:16px;
+    }
+    .wrap{
+      width:min(980px, 96vw);
+      background:#ffffff0a;
+      border:1px solid #ffffff18;
+      border-radius:22px;
+      box-shadow: 0 40px 160px #000000aa;
+      overflow:hidden;
+    }
+    header{
+      padding:14px 16px;
+      display:flex; gap:10px; align-items:center; justify-content:space-between;
+      background:#0b0710cc;
+      border-bottom:1px solid #ffffff10;
+    }
+    .title{
+      display:flex; flex-direction:column; gap:3px;
+    }
+    .title b{ font-size:14px; letter-spacing:.2px; }
+    .title span{ color:var(--mut); font-weight:800; font-size:12px; }
+    .pill{
+      display:inline-flex; gap:8px; align-items:center;
+      padding:8px 10px; border-radius:999px;
+      background:#ffffff0c; border:1px solid #ffffff14;
+      color:#ffffffd0; font-weight:900; font-size:12px;
+      white-space:nowrap;
+    }
+    .row{
+      display:grid;
+      grid-template-columns: 1fr 320px;
+      gap:0;
+    }
+    @media (max-width: 900px){
+      .row{ grid-template-columns: 1fr; }
+    }
+    canvas{ width:100%; height:auto; display:block; background:#05040a; }
+    aside{
+      padding:14px;
+      border-left:1px solid #ffffff10;
+      background:#0b07106e;
+    }
+    @media (max-width: 900px){
+      aside{ border-left:0; border-top:1px solid #ffffff10; }
+    }
+    .box{
+      background:#ffffff0a;
+      border:1px solid #ffffff14;
+      border-radius:18px;
+      padding:12px;
+      margin-bottom:12px;
+    }
+    .box h3{ margin:0 0 8px; font-size:13px; font-weight:950; }
+    .box p{ margin:0; color:var(--mut); font-weight:800; font-size:12.5px; line-height:1.4; }
+    .btns{ display:flex; gap:10px; flex-wrap:wrap; margin-top:10px; }
+    button{
+      appearance:none; border:0; cursor:pointer;
+      color:white; font-weight:950;
+      padding:10px 12px;
+      border-radius:14px;
+      background: linear-gradient(135deg, #ff4d6d, #ff7a9c);
+      box-shadow: 0 16px 40px #ff4d6d25;
+      transition:.12s ease;
+    }
+    button:hover{ transform:translateY(-1px); filter:brightness(1.05); }
+    button:active{ transform:translateY(1px); }
+    .b2{ background: linear-gradient(135deg, #7b2cff, #b08cff); box-shadow:0 16px 40px #7b2cff22; }
+    .b3{ background: linear-gradient(135deg, #00d4a1, #7fffe0); color:#062015; box-shadow:0 16px 40px #00d4a122; }
+    .small{ font-size:11px; opacity:.9; }
+    .legend{
+      display:grid; grid-template-columns: 1fr 1fr;
+      gap:10px; margin-top:10px;
+    }
+    .lg{ display:flex; align-items:center; gap:8px; font-weight:900; font-size:12px; color:#ffffffd0; }
+    .sq{ width:14px; height:14px; border-radius:4px; border:1px solid #ffffff22; }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <header>
+      <div class="title">
+        <b>🔥 Ateş & 💧 Su — Elif’im Edition 🧸</b>
+        <span>WASD (Su) • Ok tuşları (Ateş) • R: Bölüm sıfırla</span>
+      </div>
+      <div class="pill">Bölüm: <span id="lvl">1</span>/50 • Elmas: <span id="gems">0</span></div>
+    </header>
+
+    <div class="row">
+      <canvas id="c" width="960" height="540"></canvas>
+
+      <aside>
+        <div class="box">
+          <h3>🎮 Amaç</h3>
+          <p>
+            İki karakter de kendi kapısına ulaşsın. <br/>
+            💧 Su, 🔥 lavaya girmez. 🔥 Ateş, 💧 suya girmez. <br/>
+            🟩 Asit ikisini de yakar.
+          </p>
+
+          <div class="legend">
+            <div class="lg"><span class="sq" style="background:#2a2a33"></span> Duvar</div>
+            <div class="lg"><span class="sq" style="background:#0aa3ff"></span> Su</div>
+            <div class="lg"><span class="sq" style="background:#ff4d6d"></span> Lava</div>
+            <div class="lg"><span class="sq" style="background:#00d4a1"></span> Asit</div>
+            <div class="lg"><span class="sq" style="background:#7b2cff"></span> Su elması</div>
+            <div class="lg"><span class="sq" style="background:#ff9f1c"></span> Ateş elması</div>
+          </div>
+
+          <div class="btns">
+            <button id="prev" class="b2">⬅ Önceki</button>
+            <button id="next">Sonraki ➡</button>
+            <button id="reset" class="b3">R: Sıfırla</button>
+          </div>
+          <p class="small" style="margin-top:10px; color:#ffffffb8; font-weight:800;">
+            Not: İlk 10 bölüm özenli. 11–50 “oynanabilir üretim” (sonra istersek tek tek özel tasarlarız).
+          </p>
+        </div>
+
+        <div class="box">
+          <h3>💗 Minnoş mesaj</h3>
+          <p id="msg">Elif’im… takım oyunu gibi: ikimiz de aynı anda kazanıyoruz 😄</p>
+        </div>
+      </aside>
+    </div>
+  </div>
+
+<script>
+(() => {
+  const canvas = document.getElementById("c");
+  const ctx = canvas.getContext("2d");
+  const lvlEl = document.getElementById("lvl");
+  const gemsEl = document.getElementById("gems");
+  const msgEl = document.getElementById("msg");
+
+  // Tiles:
+  // # wall, . empty, W water, L lava, A acid
+  // s water gem, f fire gem
+  // D water door, F fire door
+  // p water spawn, q fire spawn
+  const TILE = 30;
+  const COLS = Math.floor(canvas.width / TILE);  // 32
+  const ROWS = Math.floor(canvas.height / TILE); // 18
+
+  const COLORS = {
+    wall:"#2a2a33",
+    empty:"#05040a",
+    water:"#0aa3ff",
+    lava:"#ff4d6d",
+    acid:"#00d4a1",
+    wgem:"#7b2cff",
+    fgem:"#ff9f1c",
+    wdoor:"#7b2cff",
+    fdoor:"#ff4d6d",
+  };
+
+  // --- Level helpers ---
+  function borderRoom(){
+    const g = Array.from({length:ROWS}, () => Array(COLS).fill("."));
+    for(let y=0;y<ROWS;y++){
+      for(let x=0;x<COLS;x++){
+        if(y===0||y===ROWS-1||x===0||x===COLS-1) g[y][x]="#";
+      }
+    }
+    return g;
+  }
+  function put(g,x,y,ch){ if(y>=0&&y<ROWS&&x>=0&&x<COLS) g[y][x]=ch; }
+  function rect(g,x0,y0,w,h,ch){
+    for(let y=y0;y<y0+h;y++) for(let x=x0;x<x0+w;x++) put(g,x,y,ch);
+  }
+  function platform(g,x0,y,w){
+    for(let x=x0;x<x0+w;x++) put(g,x,y,"#");
+  }
+
+  // 10 hand-made-ish levels, remaining generated variations
+  function makeLevels(){
+    const levels = [];
+
+    // L1: tutorial
+    {
+      const g = borderRoom();
+      platform(g,2,15,28);
+      platform(g,6,11,6);
+      platform(g,20,11,6);
+      put(g,4,14,"p"); put(g,6,14,"q");
+      put(g,26,14,"D"); put(g,28,14,"F");
+      put(g,8,10,"s"); put(g,22,10,"f");
+      levels.push(g);
+    }
+
+    // L2: hazards intro
+    {
+      const g = borderRoom();
+      platform(g,2,15,28);
+      rect(g,10,16,6,1,"W");
+      rect(g,16,16,6,1,"L");
+      platform(g,4,12,8);
+      platform(g,20,12,8);
+      put(g,4,14,"p"); put(g,6,14,"q");
+      put(g,26,14,"D"); put(g,28,14,"F");
+      put(g,7,11,"s"); put(g,25,11,"f");
+      levels.push(g);
+    }
+
+    // L3: acid in middle
+    {
+      const g = borderRoom();
+      platform(g,2,15,28);
+      rect(g,13,16,6,1,"A");
+      platform(g,4,12,6);
+      platform(g,22,12,6);
+      platform(g,12,10,8);
+      put(g,4,14,"p"); put(g,6,14,"q");
+      put(g,26,14,"D"); put(g,28,14,"F");
+      put(g,8,11,"s"); put(g,24,11,"f");
+      levels.push(g);
+    }
+
+    // L4: split lanes
+    {
+      const g = borderRoom();
+      platform(g,2,15,28);
+      platform(g,2,12,12);
+      platform(g,18,12,12);
+      rect(g,14,16,4,1,"A");
+      rect(g,6,16,6,1,"W");
+      rect(g,20,16,6,1,"L");
+      put(g,4,14,"p"); put(g,6,14,"q");
+      put(g,26,14,"D"); put(g,28,14,"F");
+      put(g,8,11,"s"); put(g,22,11,"f");
+      levels.push(g);
+    }
+
+    // L5: zigzag
+    {
+      const g = borderRoom();
+      platform(g,2,15,28);
+      platform(g,4,13,8);
+      platform(g,20,13,8);
+      platform(g,10,10,12);
+      rect(g,12,16,8,1,"A");
+      put(g,4,14,"p"); put(g,6,14,"q");
+      put(g,26,14,"D"); put(g,28,14,"F");
+      put(g,12,9,"s"); put(g,20,9,"f");
+      levels.push(g);
+    }
+
+    // L6: more hazards
+    {
+      const g = borderRoom();
+      platform(g,2,15,28);
+      platform(g,6,12,20);
+      rect(g,9,16,6,1,"W");
+      rect(g,17,16,6,1,"L");
+      rect(g,14,13,4,1,"A");
+      put(g,4,14,"p"); put(g,6,14,"q");
+      put(g,26,14,"D"); put(g,28,14,"F");
+      put(g,10,11,"s"); put(g,22,11,"f");
+      levels.push(g);
+    }
+
+    // L7: “bridge”
+    {
+      const g = borderRoom();
+      platform(g,2,15,28);
+      platform(g,6,11,20);
+      platform(g,12,8,8);
+      rect(g,12,16,8,1,"A");
+      put(g,4,14,"p"); put(g,6,14,"q");
+      put(g,26,14,"D"); put(g,28,14,"F");
+      put(g,13,7,"s"); put(g,18,7,"f");
+      levels.push(g);
+    }
+
+    // L8: tight jumps
+    {
+      const g = borderRoom();
+      platform(g,2,15,28);
+      platform(g,4,12,6);
+      platform(g,12,10,6);
+      platform(g,20,12,6);
+      rect(g,14,16,4,1,"A");
+      rect(g,8,16,4,1,"W");
+      rect(g,20,16,4,1,"L");
+      put(g,4,14,"p"); put(g,6,14,"q");
+      put(g,26,14,"D"); put(g,28,14,"F");
+      put(g,13,9,"s"); put(g,15,9,"f");
+      levels.push(g);
+    }
+
+    // L9: longer route
+    {
+      const g = borderRoom();
+      platform(g,2,15,28);
+      platform(g,2,12,10);
+      platform(g,20,12,10);
+      platform(g,10,9,12);
+      rect(g,12,16,8,1,"A");
+      put(g,4,14,"p"); put(g,6,14,"q");
+      put(g,26,14,"D"); put(g,28,14,"F");
+      put(g,6,11,"s"); put(g,26,11,"f");
+      levels.push(g);
+    }
+
+    // L10: mix
+    {
+      const g = borderRoom();
+      platform(g,2,15,28);
+      platform(g,6,12,8);
+      platform(g,18,12,8);
+      platform(g,12,9,8);
+      rect(g,10,16,6,1,"W");
+      rect(g,16,16,6,1,"L");
+      rect(g,13,13,6,1,"A");
+      put(g,4,14,"p"); put(g,6,14,"q");
+      put(g,26,14,"D"); put(g,28,14,"F");
+      put(g,12,8,"s"); put(g,19,8,"f");
+      levels.push(g);
+    }
+
+    // Generated levels 11..50
+    for(let i=10;i<50;i++){
+      const g = borderRoom();
+      platform(g,2,15,28);
+
+      // vary platforms
+      const seed = i+1;
+      const p1 = 4 + (seed*3)%10;
+      const p2 = 18 + (seed*5)%8;
+      platform(g, p1, 12, 6);
+      platform(g, p2, 12, 6);
+
+      const midW = 4 + (seed%6);
+      platform(g, 10, 9 + (seed%2), 12);
+
+      // hazards pattern
+      const hz = 10 + (seed%6);
+      rect(g, hz, 16, 5, 1, (seed%3===0)?"A":(seed%2===0)?"W":"L");
+      rect(g, hz+6, 16, 5, 1, (seed%3===1)?"A":(seed%2===0)?"L":"W");
+
+      // spawns & doors
+      put(g, 4,14,"p");
+      put(g, 6,14,"q");
+      put(g, 26,14,"D");
+      put(g, 28,14,"F");
+
+      // gems
+      put(g, p1+2,11,"s");
+      put(g, p2+2,11,"f");
+      levels.push(g);
+    }
+
+    return levels;
+  }
+
+  const LEVELS = makeLevels();
+
+  // --- Game state ---
+  let levelIndex = 0;
+  let grid, gemsTotal = 0;
+
+  const keys = {};
+  window.addEventListener("keydown", e => {
+    keys[e.key] = true;
+    if(e.key.toLowerCase()==="r") resetLevel();
+  });
+  window.addEventListener("keyup", e => keys[e.key] = false);
+
+  const playerWater = { x:0, y:0, vx:0, vy:0, w:18, h:22, color:"#0aa3ff", type:"water", gems:0, alive:true, onGround:false };
+  const playerFire  = { x:0, y:0, vx:0, vy:0, w:18, h:22, color:"#ff4d6d", type:"fire",  gems:0, alive:true, onGround:false };
+
+  function tileAt(px, py){
+    const tx = Math.floor(px / TILE);
+    const ty = Math.floor(py / TILE);
+    if(ty<0||ty>=ROWS||tx<0||tx>=COLS) return "#";
+    return grid[ty][tx];
+  }
+  function isSolid(ch){ return ch === "#"; }
+  function isHazard(ch){
+    return ch==="W" || ch==="L" || ch==="A";
+  }
+
+  function findChar(ch){
+    for(let y=0;y<ROWS;y++){
+      for(let x=0;x<COLS;x++){
+        if(grid[y][x]===ch) return {x,y};
+      }
+    }
+    return null;
+  }
+
+  function loadLevel(i){
+    levelIndex = Math.max(0, Math.min(49, i));
+    grid = LEVELS[levelIndex].map(r => r.slice());
+    gemsTotal = 0;
+
+    const p = findChar("p");
+    const q = findChar("q");
+    playerWater.x = (p.x*TILE) + 6; playerWater.y = (p.y*TILE) + 4;
+    playerFire.x  = (q.x*TILE) + 6; playerFire.y  = (q.y*TILE) + 4;
+    playerWater.vx=playerWater.vy=0;
+    playerFire.vx=playerFire.vy=0;
+    playerWater.gems=0; playerFire.gems=0;
+    playerWater.alive=true; playerFire.alive=true;
+
+    // count gems
+    for(let y=0;y<ROWS;y++) for(let x=0;x<COLS;x++){
+      if(grid[y][x]==="s"||grid[y][x]==="f") gemsTotal++;
+    }
+
+    lvlEl.textContent = (levelIndex+1);
+    gemsEl.textContent = "0/" + gemsTotal;
+    msgEl.textContent = pickMsg(levelIndex);
+  }
+
+  function resetLevel(){ loadLevel(levelIndex); }
+
+  function pickMsg(i){
+    const msgs = [
+      "Elif’im… takım oyunu gibi: ikimiz de aynı anda kazanıyoruz 😄",
+      "Minnoş taktik: önce elmas, sonra kapı 💗",
+      "Biri düşerse öbürü de üzülür… dikkat 🧸",
+      "Elif’im gülünce ben +10 güç alıyorum ✨",
+      "Bu bölüm ‘sarılma arası’ gibi: kısa ama tatlı 😌",
+      "Birlikte olunca her bölüm geçilir 💞"
+    ];
+    return msgs[i % msgs.length];
+  }
+
+  function rectVsRect(a,b){
+    return a.x < b.x+b.w && a.x+a.w > b.x && a.y < b.y+b.h && a.y+a.h > b.y;
+  }
+
+  function movePlayer(pl, left, right, jump){
+    const speed = 2.2;
+    const gravity = 0.35;
+    const jumpV = 7.2;
+
+    pl.vx = 0;
+    if(left) pl.vx = -speed;
+    if(right) pl.vx = speed;
+
+    // jump
+    if(jump && pl.onGround){
+      pl.vy = -jumpV;
+      pl.onGround = false;
+    }
+
+    pl.vy += gravity;
+    pl.vy = Math.min(pl.vy, 9);
+
+    // x move
+    pl.x += pl.vx;
+    collide(pl, "x");
+
+    // y move
+    pl.y += pl.vy;
+    pl.onGround = false;
+    collide(pl, "y");
+
+    // hazards & pickups & doors
+    interact(pl);
+  }
+
+  function collide(pl, axis){
+    // sample four corners
+    const pts = [
+      {x: pl.x, y: pl.y},
+      {x: pl.x+pl.w, y: pl.y},
+      {x: pl.x, y: pl.y+pl.h},
+      {x: pl.x+pl.w, y: pl.y+pl.h},
+    ];
+
+    for(const p of pts){
+      const ch = tileAt(p.x, p.y);
+      if(isSolid(ch)){
+        const tx = Math.floor(p.x / TILE);
+        const ty = Math.floor(p.y / TILE);
+        const tileRect = { x:tx*TILE, y:ty*TILE, w:TILE, h:TILE };
+        const pr = { x:pl.x, y:pl.y, w:pl.w, h:pl.h };
+
+        if(rectVsRect(pr, tileRect)){
+          if(axis==="x"){
+            if(pl.vx>0) pl.x = tileRect.x - pl.w - 0.01;
+            if(pl.vx<0) pl.x = tileRect.x + tileRect.w + 0.01;
+            pl.vx = 0;
+          }else{
+            if(pl.vy>0){
+              pl.y = tileRect.y - pl.h - 0.01;
+              pl.vy = 0;
+              pl.onGround = true;
+            }
+            if(pl.vy<0){
+              pl.y = tileRect.y + tileRect.h + 0.01;
+              pl.vy = 0;
+            }
+          }
+        }
+      }
+    }
+  }
+
+  function interact(pl){
+    // center point
+    const cx = pl.x + pl.w/2;
+    const cy = pl.y + pl.h/2;
+    const tx = Math.floor(cx / TILE);
+    const ty = Math.floor(cy / TILE);
+    const ch = grid[ty]?.[tx];
+
+    // hazards
+    if(ch==="W" && pl.type==="fire") die();
+    if(ch==="L" && pl.type==="water") die();
+    if(ch==="A") die();
+
+    // gems
+    if(ch==="s" && pl.type==="water"){ grid[ty][tx]="."; pl.gems++; }
+    if(ch==="f" && pl.type==="fire"){ grid[ty][tx]="."; pl.gems++; }
+
+    const total = playerWater.gems + playerFire.gems;
+    gemsEl.textContent = total + "/" + gemsTotal;
+
+    function die(){
+      playerWater.alive=false; playerFire.alive=false;
+    }
+  }
+
+  function reachedDoor(pl){
+    const cx = pl.x + pl.w/2;
+    const cy = pl.y + pl.h/2;
+    const tx = Math.floor(cx / TILE);
+    const ty = Math.floor(cy / TILE);
+    const ch = grid[ty]?.[tx];
+    return (pl.type==="water" && ch==="D") || (pl.type==="fire" && ch==="F");
+  }
+
+  function update(){
+    // controls
+    if(playerWater.alive){
+      movePlayer(
+        playerWater,
+        keys["a"]||keys["A"],
+        keys["d"]||keys["D"],
+        keys["w"]||keys["W"]
+      );
+    }
+    if(playerFire.alive){
+      movePlayer(
+        playerFire,
+        keys["ArrowLeft"],
+        keys["ArrowRight"],
+        keys["ArrowUp"]
+      );
+    }
+
+    // fail
+    if(!playerWater.alive || !playerFire.alive){
+      // restart after short delay vibe
+      // (simple: show text, wait input R or click reset)
+    }
+
+    // win
+    const win = reachedDoor(playerWater) && reachedDoor(playerFire);
+    if(win){
+      if(levelIndex < 49) loadLevel(levelIndex+1);
+      else {
+        // finished
+        msgEl.textContent = "Bitti 🥹 50/50… Elif’im’le her şey tamam 💗";
+      }
+    }
+
+    draw();
+    requestAnimationFrame(update);
+  }
+
+  function draw(){
+    // clear
+    ctx.clearRect(0,0,canvas.width,canvas.height);
+
+    // tiles
+    for(let y=0;y<ROWS;y++){
+      for(let x=0;x<COLS;x++){
+        const ch = grid[y][x];
+        if(ch === ".") continue;
+
+        let color = null;
+        if(ch==="#") color = COLORS.wall;
+        if(ch==="W") color = COLORS.water;
+        if(ch==="L") color = COLORS.lava;
+        if(ch==="A") color = COLORS.acid;
+
+        if(color){
+          ctx.fillStyle = color;
+          ctx.fillRect(x*TILE, y*TILE, TILE, TILE);
+          continue;
+        }
+
+        // gems / doors / spawns (render simple)
+        if(ch==="s"){
+          ctx.fillStyle = COLORS.wgem;
+          ctx.beginPath();
+          ctx.arc(x*TILE+TILE/2, y*TILE+TILE/2, 6, 0, Math.PI*2);
+          ctx.fill();
+        }
+        if(ch==="f"){
+          ctx.fillStyle = COLORS.fgem;
+          ctx.beginPath();
+          ctx.arc(x*TILE+TILE/2, y*TILE+TILE/2, 6, 0, Math.PI*2);
+          ctx.fill();
+        }
+        if(ch==="D"){
+          ctx.fillStyle = COLORS.wdoor;
+          ctx.fillRect(x*TILE+6, y*TILE+4, TILE-12, TILE-8);
+        }
+        if(ch==="F"){
+          ctx.fillStyle = COLORS.fdoor;
+          ctx.fillRect(x*TILE+6, y*TILE+4, TILE-12, TILE-8);
+        }
+      }
+    }
+
+    // players
+    drawPlayer(playerWater);
+    drawPlayer(playerFire);
+
+    // overlays
+    if(!playerWater.alive || !playerFire.alive){
+      ctx.fillStyle = "#000000aa";
+      ctx.fillRect(0,0,canvas.width,canvas.height);
+      ctx.fillStyle = "#ffffff";
+      ctx.font = "900 22px ui-rounded, system-ui";
+      ctx.fillText("Oops… yanma oldu 😄", 24, 60);
+      ctx.font = "800 14px ui-rounded, system-ui";
+      ctx.fillStyle = "#ffffffcc";
+      ctx.fillText("R’ye bas veya sağdan Sıfırla’ya tıkla.", 24, 88);
+    }
+  }
+
+  function drawPlayer(pl){
+    ctx.save();
+    ctx.fillStyle = pl.color;
+    ctx.fillRect(pl.x, pl.y, pl.w, pl.h);
+    // little face dot
+    ctx.fillStyle = "#ffffffcc";
+    ctx.fillRect(pl.x+5, pl.y+7, 3, 3);
+    ctx.fillRect(pl.x+pl.w-8, pl.y+7, 3, 3);
+    ctx.restore();
+  }
+
+  // UI buttons
+  document.getElementById("prev").addEventListener("click", ()=> loadLevel(Math.max(0, levelIndex-1)));
+  document.getElementById("next").addEventListener("click", ()=> loadLevel(Math.min(49, levelIndex+1)));
+  document.getElementById("reset").addEventListener("click", resetLevel);
+
+  // start
+  loadLevel(0);
+  update();
+})();
+</script>
+</body>
+</html>
