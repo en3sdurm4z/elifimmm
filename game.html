@@ -11,7 +11,7 @@
       --glass:#ffffff0a; --stroke:#ffffff14; --shadow:0 40px 160px #000000aa;
       --r:22px;
       --vh: 1vh;
-      --padH: 0px; /* mobilde JS/CSS ile ayarlanacak */
+      --padH: 0px;
     }
     *{box-sizing:border-box}
     html,body{height:100%}
@@ -30,7 +30,7 @@
       place-items:center;
       padding: max(12px, env(safe-area-inset-top)) 12px max(12px, env(safe-area-inset-bottom));
       overflow:hidden;
-      touch-action: none;
+      touch-action:none;
     }
 
     .wrap{
@@ -74,39 +74,51 @@
     .row{
       display:grid;
       grid-template-columns: 1fr 330px;
-      gap:0;
     }
     @media (max-width: 950px){
       .row{grid-template-columns:1fr}
     }
 
-    /* ✅ OYUN ALANI: altta kontrol barı için alan açıyoruz */
+    /* ✅ OYUN ALANI: canvas üstte, tuş barı altta (gerçekten ayrı alan) */
     .gameArea{
       position:relative;
       background:#05040a;
       border-right:1px solid #ffffff10;
       overflow:hidden;
-      aspect-ratio: 16 / 9;
+
+      display:grid;
+      grid-template-rows: 1fr var(--padH);
+      min-height: 520px;
     }
     @media (max-width: 950px){
-      :root{ --padH: 110px; } /* mobilde tuş barı yüksekliği */
+      :root{ --padH: 120px; }
       .gameArea{
         border-right:0;
         border-bottom:1px solid #ffffff10;
-        max-height: min(62vh, 520px);
+        min-height: min(68vh, 620px);
       }
     }
 
-    /* ✅ Canvas sadece oyun görünen alanı kaplar (tuşların üstüne binmez) */
+    /* canvas: üst satırı doldurur */
     canvas{
-      position:absolute;
-      left:0; top:0; right:0;
-      bottom: var(--padH);
       width:100%;
-      height:auto;
-      background:#05040a;
+      height:100%;
       display:block;
+      background:#05040a;
     }
+
+    .hint{
+      position:absolute; top:10px; left:10px; right:10px;
+      text-align:center;
+      color:#ffffffd0;
+      font-weight:900;
+      font-size:12px;
+      text-shadow: 0 12px 28px #000;
+      pointer-events:none;
+      display:none;
+      z-index:3;
+    }
+    @media (max-width: 950px){ .hint{display:block} }
 
     aside{
       padding:14px;
@@ -150,18 +162,15 @@
       line-height:1.35;
     }
 
-    /* ✅ Touch controls artık overlay değil, alttaki ayrılmış barda */
+    /* ✅ Mobil kontrol barı (alt satır) */
     .touchBar{
-      position:absolute;
-      left:0; right:0; bottom:0;
-      height: var(--padH);
+      grid-row:2;
       display:none;
       align-items:center;
       justify-content:space-between;
       padding: 12px 12px calc(12px + env(safe-area-inset-bottom));
-      gap: 12px;
-      background: linear-gradient(180deg, transparent, #00000055);
-      pointer-events:auto;
+      background: linear-gradient(180deg, #00000000, #00000066);
+      border-top: 1px solid #ffffff12;
     }
     @media (max-width: 950px){
       .touchBar{display:flex;}
@@ -190,19 +199,6 @@
     .tbtn:active{transform:translateY(1px); filter:brightness(1.07)}
     .tbtn.main{background:linear-gradient(135deg, #ff4d6d55, #7b2cff55)}
 
-    .hint{
-      position:absolute; top:10px; left:10px; right:10px;
-      text-align:center;
-      color:#ffffffd0;
-      font-weight:900;
-      font-size:12px;
-      text-shadow: 0 12px 28px #000;
-      pointer-events:none;
-      display:none;
-      z-index:2;
-    }
-    @media (max-width: 950px){ .hint{display:block} }
-
     /* Fullscreen */
     .fs-on{
       width:100vw !important;
@@ -216,9 +212,8 @@
     }
     .fs-on aside{display:none;}
     .fs-on .gameArea{
-      aspect-ratio:auto;
       height:100%;
-      max-height:none;
+      min-height:0;
       border:0;
     }
   </style>
@@ -231,7 +226,7 @@
         <div class="badge">🧸</div>
         <div class="title">
           <b>Elif’im için: Minoş Kedi Macerası 💗</b>
-          <span>Mobil: dokun • PC: ← → + Space (basılı tut zıpla) • R: sıfırla</span>
+          <span>Mobil: tuşlar altta • PC: ← → + Space (basılı tut zıpla) • R: sıfırla</span>
         </div>
       </div>
       <div class="pill">Bölüm <span id="lvl">1</span> • Kalp <span id="hearts">0</span>/<span id="need">0</span></div>
@@ -242,7 +237,6 @@
         <div class="hint" id="hint">İpucu: Kalpleri topla 💗 → kapıya git 🚪</div>
         <canvas id="c"></canvas>
 
-        <!-- ✅ Mobil tuşlar artık bar içinde -->
         <div class="touchBar" aria-hidden="true">
           <div class="cluster">
             <button class="tbtn" id="left">◀</button>
@@ -270,7 +264,7 @@
             <button class="b3" id="restart">Sıfırla</button>
             <button class="ghost" id="fs">⛶ Tam ekran</button>
           </div>
-          <div class="mini" id="msg">Elif’im… ilk 2 bölüm çok kolay. Sonra yavaş yavaş “mini engeller” geliyor 😄💗</div>
+          <div class="mini" id="msg">Elif’im… ilk 2 bölüm çok kolay. Sonra mini engeller geliyor 😄💗</div>
         </div>
 
         <div class="box">
@@ -283,6 +277,7 @@
 
 <script>
 (() => {
+  // ✅ gerçek ekran yüksekliği fix
   function setVH(){
     document.documentElement.style.setProperty("--vh", (window.innerHeight * 0.01) + "px");
   }
@@ -291,8 +286,6 @@
   window.addEventListener("orientationchange", () => setTimeout(setVH, 250), {passive:true});
 
   const wrap = document.getElementById("wrap");
-  const gameArea = document.getElementById("gameArea");
-
   const canvas = document.getElementById("c");
   const ctx = canvas.getContext("2d");
 
@@ -302,14 +295,18 @@
   const msgEl = document.getElementById("msg");
   const hintEl = document.getElementById("hint");
 
+  // ✅ LOGICAL sahne (oyun fiziği bu ölçekte)
   const LOG_W = 960;
   const LOG_H = 540;
 
   let DPR = 1;
   let SCALE = 1;
+  let OFFX = 0;
+  let OFFY = 0;
 
+  // ✅ Letterbox: oyun asla kesilmez, ortalanır
   function fitCanvas(){
-    const rect = canvas.getBoundingClientRect(); // ✅ canvas’ın gerçek görünen alanı
+    const rect = canvas.getBoundingClientRect();
     const cssW = Math.max(1, Math.floor(rect.width));
     const cssH = Math.max(1, Math.floor(rect.height));
 
@@ -318,11 +315,14 @@
     canvas.height = Math.floor(cssH * DPR);
 
     SCALE = Math.min(cssW / LOG_W, cssH / LOG_H);
-    ctx.setTransform(SCALE * DPR, 0, 0, SCALE * DPR, 0, 0);
+    OFFX = (cssW - LOG_W * SCALE) * 0.5;
+    OFFY = (cssH - LOG_H * SCALE) * 0.5;
+
+    ctx.setTransform(SCALE * DPR, 0, 0, SCALE * DPR, OFFX * DPR, OFFY * DPR);
   }
 
   window.addEventListener("resize", () => { setVH(); fitCanvas(); }, {passive:true});
-  setTimeout(fitCanvas, 50);
+  setTimeout(fitCanvas, 80);
 
   const TILE = 30;
   const COLS = 32;
@@ -351,18 +351,20 @@
 
   const messages = [
     "Elif’im… 1. bölüm: sadece yürü + kalp + kapı 😄",
-    "2. bölüm: zıplama var ama tatlı tatlı 💗",
-    "3. bölüm: asit geldi (yeşil) dikkat minnoşum 🧸",
-    "4. bölüm: asit üstünden atlamayı öğreniyoruz ✨",
-    "5. bölüm: B zıplama taşı (sarı) geldi 😄",
+    "2. bölüm: zıplama var ama rahat, tavan sıkmaz 💗",
+    "3. bölüm: asit geldi (yeşil) dikkat 🧸",
+    "4. bölüm: asit üstünden atlıyoruz ✨",
+    "5. bölüm: B zıplama taşı geldi 😄",
     "6. bölüm: B ile daha yükseğe çıkıyoruz 💞",
-    "7. bölüm: biraz kombin… ama geçilir ✅",
-    "8. bölüm: kalpleri sakladım, yine de adil 😄",
-    "9. bölüm: minnoş refleks lazım 🧸",
-    "10. bölüm: mini final gibi… ama kesin geçilir 💗",
+    "7. bölüm: minnoş kombin ✅",
+    "8. bölüm: kalpler saklı ama adil 😄",
+    "9. bölüm: refleks lazım 🧸",
+    "10. bölüm: mini final, geçilir 💗",
   ];
 
+  /* ✅ Kapılar zeminde (altta), platformlar tavana çok yakın değil */
   const LEVELS = [
+    // 1
     [
       "################################",
       "#..............................#",
@@ -377,14 +379,16 @@
       "#..............................#",
       "#..............................#",
       "#..............................#",
+      "#..............................#",
+      "#..............................#",
+      "#..............................#",
       "#..S.......................D...#",
-      "#..............................#",
-      "#..............................#",
-      "#..............................#",
       "################################",
     ],
+    // 2 (platformlar biraz daha aşağı, kapı zeminde)
     [
       "################################",
+      "#..............................#",
       "#..............................#",
       "#..............................#",
       "#.............H................#",
@@ -397,12 +401,12 @@
       "#..............................#",
       "#..............................#",
       "#..............................#",
+      "#..............................#",
+      "#..............................#",
       "#..S.......................D...#",
-      "#..............................#",
-      "#..............................#",
-      "#..............................#",
       "################################",
     ],
+    // 3 (asit)
     [
       "################################",
       "#..............................#",
@@ -417,14 +421,16 @@
       "#..............................#",
       "#..............................#",
       "#..............................#",
+      "#..............................#",
+      "#..............................#",
+      "#..............................#",
       "#..S.......................D...#",
-      "#..............................#",
-      "#..............................#",
-      "#..............................#",
       "################################",
     ],
+    // 4
     [
       "################################",
+      "#..............................#",
       "#..............................#",
       "#........H.....................#",
       "#.......####...................#",
@@ -437,14 +443,15 @@
       "#..............................#",
       "#..............................#",
       "#..............................#",
+      "#..............................#",
+      "#..............................#",
       "#..S.......................D...#",
-      "#..............................#",
-      "#..............................#",
-      "#..............................#",
       "################################",
     ],
+    // 5 (B)
     [
       "################################",
+      "#..............................#",
       "#..............................#",
       "#..............H...............#",
       "#..............................#",
@@ -457,14 +464,15 @@
       "#..............................#",
       "#..............................#",
       "#..............................#",
+      "#..............................#",
+      "#..............................#",
       "#..S.......................D...#",
-      "#..............................#",
-      "#..............................#",
-      "#..............................#",
       "################################",
     ],
+    // 6
     [
       "################################",
+      "#..............................#",
       "#..............................#",
       "#..............H...............#",
       "#..............................#",
@@ -477,14 +485,15 @@
       "#..............................#",
       "#..............................#",
       "#..............................#",
+      "#..............................#",
+      "#..............................#",
       "#..S.......................D...#",
-      "#..............................#",
-      "#..............................#",
-      "#..............................#",
       "################################",
     ],
+    // 7
     [
       "################################",
+      "#..............................#",
       "#..............................#",
       "#........H.....................#",
       "#.......####...................#",
@@ -497,14 +506,15 @@
       "#..............................#",
       "#..............................#",
       "#..............................#",
+      "#..............................#",
+      "#..............................#",
       "#..S.......................D...#",
-      "#..............................#",
-      "#..............................#",
-      "#..............................#",
       "################################",
     ],
+    // 8
     [
       "################################",
+      "#..............................#",
       "#..............................#",
       "#.............H................#",
       "#...........######.............#",
@@ -517,14 +527,15 @@
       "#..............................#",
       "#..............................#",
       "#..............................#",
+      "#..............................#",
+      "#..............................#",
       "#..S.......................D...#",
-      "#..............................#",
-      "#..............................#",
-      "#..............................#",
       "################################",
     ],
+    // 9
     [
       "################################",
+      "#..............................#",
       "#..............................#",
       "#........H.....................#",
       "#.......####...................#",
@@ -537,14 +548,15 @@
       "#..............................#",
       "#..............................#",
       "#..............................#",
+      "#..............................#",
+      "#..............................#",
       "#..S.......................D...#",
-      "#..............................#",
-      "#..............................#",
-      "#..............................#",
       "################################",
     ],
+    // 10
     [
       "################################",
+      "#..............................#",
       "#..............................#",
       "#.............H................#",
       "#..............................#",
@@ -557,10 +569,9 @@
       "#..............................#",
       "#..............................#",
       "#..............................#",
+      "#..............................#",
+      "#..............................#",
       "#..S.......................D...#",
-      "#..............................#",
-      "#..............................#",
-      "#..............................#",
       "################################",
     ],
   ];
@@ -656,10 +667,10 @@
   function loadLevel(i){
     levelIndex = i;
     lvlEl.textContent = (levelIndex+1);
-    msgEl.textContent = messages[levelIndex] || "Elif’im… geçilebilir yaptım, sakin sakin 😄💗";
+    msgEl.textContent = messages[levelIndex] || "Elif’im… geçilebilir yaptım 😄💗";
 
     hintEl.textContent = (levelIndex <= 1)
-      ? "İpucu: Kalpleri topla 💗 → kapıya git 🚪 (çok kolay 😄)"
+      ? "İpucu: Kalpleri topla 💗 → kapıya git 🚪"
       : (levelIndex <= 3)
         ? "İpucu: Yeşil asit (A) öldürür. Üstünden zıpla 🧸"
         : (levelIndex <= 5)
@@ -776,6 +787,14 @@
   }
 
   function step(){
+    // çizmeden önce: tüm canvası temizleyip (letterbox alan dahil) siyah bas
+    ctx.save();
+    ctx.setTransform(DPR,0,0,DPR,0,0);
+    ctx.clearRect(0,0,canvas.width, canvas.height);
+    ctx.fillStyle = "#05040a";
+    ctx.fillRect(0,0,canvas.width, canvas.height);
+    ctx.restore();
+
     if(!player.alive){
       draw();
       requestAnimationFrame(step);
@@ -897,6 +916,7 @@
     }
   }
 
+  // init
   loadLevel(0);
   requestAnimationFrame(step);
 })();
