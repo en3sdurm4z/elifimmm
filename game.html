@@ -79,34 +79,34 @@
       .row{grid-template-columns:1fr}
     }
 
-/* ✅ OYUN ALANI */
-.gameArea{
-  position:relative;
-  background:#05040a;
-  border-right:1px solid #ffffff10;
-  overflow:hidden;
+    /* ✅ OYUN ALANI: canvas üstte, tuş barı altta */
+    .gameArea{
+      position:relative;
+      background:#05040a;
+      border-right:1px solid #ffffff10;
+      overflow:hidden;
 
-  display:grid;
-  grid-template-rows: 1fr var(--padH);
-  min-height: 520px;
-}
+      display:grid;
+      grid-template-rows: 1fr var(--padH);
+      min-height: 520px;
+    }
 
-/* ✅ Küçük ekran (telefon/tablet) */
-@media (max-width: 950px){
-  :root{ --padH: 120px; }
-  .gameArea{
-    border-right:0;
-    border-bottom:1px solid #ffffff10;
-    min-height: min(68vh, 620px);
-  }
-  .touchBar{ display:flex; } /* istersen kalsın */
-}
+    /* ✅ Küçük ekran */
+    @media (max-width: 950px){
+      :root{ --padH: 120px; }
+      .gameArea{
+        border-right:0;
+        border-bottom:1px solid #ffffff10;
+        min-height: min(68vh, 620px);
+      }
+      .touchBar{ display:flex; }
+    }
 
-/* ✅ Dokunmatik cihazlarda (genişlik ne olursa olsun) tuşları göster */
-@media (hover: none) and (pointer: coarse) {
-  :root{ --padH: 120px; }
-  .touchBar{ display:flex; }
-}
+    /* ✅ Dokunmatik cihazlarda (genişlik ne olursa olsun) tuşları göster */
+    @media (hover: none) and (pointer: coarse) {
+      :root{ --padH: 120px; }
+      .touchBar{ display:flex; }
+    }
 
     canvas{
       width:100%;
@@ -224,6 +224,10 @@
       min-height:0;
       border:0;
     }
+
+    /* ✅ GARANTİ: dokunmatik cihazda tuşlar her zaman görünür */
+    body.touch { --padH: 120px; }
+    body.touch .touchBar{ display:flex !important; }
   </style>
 </head>
 
@@ -285,6 +289,14 @@
 
 <script>
 (() => {
+  // ✅ dokunmatik cihazı yakala ve tuşları GARANTİ aç
+  const isTouch =
+    (navigator.maxTouchPoints && navigator.maxTouchPoints > 0) ||
+    ("ontouchstart" in window) ||
+    window.matchMedia("(hover: none) and (pointer: coarse)").matches;
+
+  if(isTouch) document.body.classList.add("touch");
+
   // ✅ gerçek ekran yüksekliği fix
   function setVH(){
     document.documentElement.style.setProperty("--vh", (window.innerHeight * 0.01) + "px");
@@ -573,7 +585,7 @@
     ],
   ];
 
-  // ✅ DÜZELTME: S ve D sabit, içerik (H/A/B + iç #) aşağı normalize
+  // ✅ düzeltme: içerik aşağı normalize (S ve D sabit)
   function normalizeLevel(lines){
     const src = lines.map(r => r.split(""));
     const H = src.length;
@@ -589,9 +601,8 @@
     const isContent = (ch, x, y) => {
       if(ch === "H" || ch === "A" || ch === "B") return true;
       if(ch === "#"){
-        // border değilse iç platform say
-        if(x===0 || y===0 || x===W-1 || y===H-1) return false;
-        return true;
+        if(x===0 || y===0 || x===W-1 || y===H-1) return false; // border değil
+        return true; // iç platform
       }
       return false;
     };
@@ -608,7 +619,7 @@
     }
     if(maxY < 0) return lines;
 
-    const desiredMaxY = H - 3;
+    const desiredMaxY = H - 3;           // içerik zemine yakın olsun
     let dy = desiredMaxY - maxY;
 
     dy = Math.max(dy, 1 - minY);
@@ -674,6 +685,7 @@
   hold(rightBtn, ()=>keys.right=true, ()=>keys.right=false);
   hold(jumpBtn, ()=>{ keys.jumpHeld = true; keys.jumpPressed = true; }, ()=>{ keys.jumpHeld = false; });
 
+  // keyboard
   window.addEventListener("keydown", (e)=>{
     if(e.key==="ArrowLeft") keys.left=true;
     if(e.key==="ArrowRight") keys.right=true;
@@ -689,11 +701,13 @@
     if(e.key===" " || e.key==="ArrowUp") keys.jumpHeld=false;
   });
 
+  // UI
   document.getElementById("prev").addEventListener("click", ()=> loadLevel(Math.max(0, levelIndex-1)));
   document.getElementById("next").addEventListener("click", ()=> loadLevel(Math.min(LEVELS.length-1, levelIndex+1)));
   document.getElementById("restart").addEventListener("click", ()=> loadLevel(levelIndex));
   document.getElementById("reset").addEventListener("click", ()=> loadLevel(levelIndex));
 
+  // fullscreen
   document.getElementById("fs").addEventListener("click", async ()=>{
     try{
       if(!document.fullscreenElement){
@@ -721,7 +735,6 @@
   };
 
   function parseLevel(lines){
-    
     lines = normalizeLevel(lines);
 
     grid = lines.map(line=> line.split(""));
