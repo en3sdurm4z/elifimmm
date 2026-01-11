@@ -10,7 +10,8 @@
       --text:#f5f2ff; --muted:#cfc6ea;
       --glass:#ffffff0a; --stroke:#ffffff14; --shadow:0 40px 160px #000000aa;
       --r:22px;
-      --vh: 1vh; /* JS dolduracak */
+      --vh: 1vh;
+      --padH: 0px; /* mobilde JS/CSS ile ayarlanacak */
     }
     *{box-sizing:border-box}
     html,body{height:100%}
@@ -79,6 +80,7 @@
       .row{grid-template-columns:1fr}
     }
 
+    /* ✅ OYUN ALANI: altta kontrol barı için alan açıyoruz */
     .gameArea{
       position:relative;
       background:#05040a;
@@ -87,18 +89,23 @@
       aspect-ratio: 16 / 9;
     }
     @media (max-width: 950px){
+      :root{ --padH: 110px; } /* mobilde tuş barı yüksekliği */
       .gameArea{
         border-right:0;
         border-bottom:1px solid #ffffff10;
-        max-height: min(56vh, 420px);
+        max-height: min(62vh, 520px);
       }
     }
 
+    /* ✅ Canvas sadece oyun görünen alanı kaplar (tuşların üstüne binmez) */
     canvas{
-      display:block;
+      position:absolute;
+      left:0; top:0; right:0;
+      bottom: var(--padH);
       width:100%;
-      height:100%;
+      height:auto;
       background:#05040a;
+      display:block;
     }
 
     aside{
@@ -143,16 +150,25 @@
       line-height:1.35;
     }
 
-    .touch{position:absolute; inset:0; pointer-events:none;}
-    .pad{
-      position:absolute; bottom:12px;
-      display:flex; gap:10px; align-items:flex-end;
-      pointer-events:auto; user-select:none;
+    /* ✅ Touch controls artık overlay değil, alttaki ayrılmış barda */
+    .touchBar{
+      position:absolute;
+      left:0; right:0; bottom:0;
+      height: var(--padH);
+      display:none;
+      align-items:center;
+      justify-content:space-between;
+      padding: 12px 12px calc(12px + env(safe-area-inset-bottom));
+      gap: 12px;
+      background: linear-gradient(180deg, transparent, #00000055);
+      pointer-events:auto;
     }
-    .pad.left{left:12px}
-    .pad.right{right:12px}
+    @media (max-width: 950px){
+      .touchBar{display:flex;}
+    }
+
     .cluster{
-      display:flex; gap:10px; align-items:flex-end;
+      display:flex; gap:10px; align-items:center;
       padding:10px;
       border-radius:18px;
       background:#00000055;
@@ -173,6 +189,7 @@
     }
     .tbtn:active{transform:translateY(1px); filter:brightness(1.07)}
     .tbtn.main{background:linear-gradient(135deg, #ff4d6d55, #7b2cff55)}
+
     .hint{
       position:absolute; top:10px; left:10px; right:10px;
       text-align:center;
@@ -182,9 +199,11 @@
       text-shadow: 0 12px 28px #000;
       pointer-events:none;
       display:none;
+      z-index:2;
     }
     @media (max-width: 950px){ .hint{display:block} }
 
+    /* Fullscreen */
     .fs-on{
       width:100vw !important;
       height: calc(var(--vh) * 100) !important;
@@ -223,18 +242,15 @@
         <div class="hint" id="hint">İpucu: Kalpleri topla 💗 → kapıya git 🚪</div>
         <canvas id="c"></canvas>
 
-        <div class="touch" aria-hidden="true">
-          <div class="pad left">
-            <div class="cluster">
-              <button class="tbtn" id="left">◀</button>
-              <button class="tbtn" id="right">▶</button>
-            </div>
+        <!-- ✅ Mobil tuşlar artık bar içinde -->
+        <div class="touchBar" aria-hidden="true">
+          <div class="cluster">
+            <button class="tbtn" id="left">◀</button>
+            <button class="tbtn" id="right">▶</button>
           </div>
-          <div class="pad right">
-            <div class="cluster">
-              <button class="tbtn main" id="jump">⤒</button>
-              <button class="tbtn" id="reset">R</button>
-            </div>
+          <div class="cluster">
+            <button class="tbtn main" id="jump">⤒</button>
+            <button class="tbtn" id="reset">R</button>
           </div>
         </div>
       </div>
@@ -267,7 +283,6 @@
 
 <script>
 (() => {
-  // ✅ gerçek ekran yüksekliği (iOS/Android adres çubuğu fix)
   function setVH(){
     document.documentElement.style.setProperty("--vh", (window.innerHeight * 0.01) + "px");
   }
@@ -287,38 +302,32 @@
   const msgEl = document.getElementById("msg");
   const hintEl = document.getElementById("hint");
 
-  // ✅ LOGICAL sahne boyutu (dünya bu ölçekte)
   const LOG_W = 960;
   const LOG_H = 540;
 
-  // ✅ canvas fit
   let DPR = 1;
   let SCALE = 1;
 
   function fitCanvas(){
-    const rect = gameArea.getBoundingClientRect();
+    const rect = canvas.getBoundingClientRect(); // ✅ canvas’ın gerçek görünen alanı
     const cssW = Math.max(1, Math.floor(rect.width));
     const cssH = Math.max(1, Math.floor(rect.height));
 
     DPR = Math.min(2, window.devicePixelRatio || 1);
-
     canvas.width  = Math.floor(cssW * DPR);
     canvas.height = Math.floor(cssH * DPR);
 
     SCALE = Math.min(cssW / LOG_W, cssH / LOG_H);
-
-    // LOG koordinatları çiz, ekranda SCALE ile görün
     ctx.setTransform(SCALE * DPR, 0, 0, SCALE * DPR, 0, 0);
   }
-  window.addEventListener("resize", () => { setVH(); fitCanvas(); }, {passive:true});
-  fitCanvas();
 
-  // Dünya grid
+  window.addEventListener("resize", () => { setVH(); fitCanvas(); }, {passive:true});
+  setTimeout(fitCanvas, 50);
+
   const TILE = 30;
   const COLS = 32;
   const ROWS = 18;
 
-  // tiles: # wall, . empty, S spawn, H heart, D door, A acid, B bounce
   const colors = {
     wall:"#2a2a33",
     acid:"#00d4a1",
@@ -561,13 +570,8 @@
   let needHearts = 0;
   let gotHearts = 0;
 
-  // ✅ Kamera (tuşlar karakteri kapatmasın diye)
-  let camX = 0, camY = 0;
-  function clamp(v, a, b){ return Math.max(a, Math.min(b, v)); }
-
   const keys = { left:false, right:false, jumpHeld:false, jumpPressed:false };
 
-  // touch
   const leftBtn = document.getElementById("left");
   const rightBtn = document.getElementById("right");
   const jumpBtn = document.getElementById("jump");
@@ -584,7 +588,6 @@
   hold(rightBtn, ()=>keys.right=true, ()=>keys.right=false);
   hold(jumpBtn, ()=>{ keys.jumpHeld = true; keys.jumpPressed = true; }, ()=>{ keys.jumpHeld = false; });
 
-  // keyboard
   window.addEventListener("keydown", (e)=>{
     if(e.key==="ArrowLeft") keys.left=true;
     if(e.key==="ArrowRight") keys.right=true;
@@ -600,13 +603,11 @@
     if(e.key===" " || e.key==="ArrowUp") keys.jumpHeld=false;
   });
 
-  // UI
   document.getElementById("prev").addEventListener("click", ()=> loadLevel(Math.max(0, levelIndex-1)));
   document.getElementById("next").addEventListener("click", ()=> loadLevel(Math.min(LEVELS.length-1, levelIndex+1)));
   document.getElementById("restart").addEventListener("click", ()=> loadLevel(levelIndex));
   document.getElementById("reset").addEventListener("click", ()=> loadLevel(levelIndex));
 
-  // fullscreen
   document.getElementById("fs").addEventListener("click", async ()=>{
     try{
       if(!document.fullscreenElement){
@@ -644,12 +645,6 @@
         if(ch==="S"){
           player.x = x*TILE + 6;
           player.y = y*TILE + 4;
-
-          // ✅ mobilde tuşlar kapatmasın diye başlangıcı biraz yukarı al
-          if (window.matchMedia("(max-width: 950px)").matches) {
-            player.y = Math.max(20, player.y - 70);
-          }
-
           grid[y][x]=".";
         }
       }
@@ -678,10 +673,7 @@
     player.coyote = 0;
     player.jumpBoost = 0;
 
-    // ✅ kamera reset
-    camX = 0; camY = 0;
-
-    fitCanvas();
+    setTimeout(fitCanvas, 30);
   }
 
   function tileAt(px, py){
@@ -783,24 +775,6 @@
     }
   }
 
-  function updateCamera(){
-    // hedef: oyuncu biraz üstte kalsın (mobil tuşları kapatmasın)
-    const isMobile = window.matchMedia("(max-width: 950px)").matches;
-    const targetX = player.x + player.w/2 - LOG_W*0.5;
-    const targetY = player.y + player.h/2 - (isMobile ? LOG_H*0.58 : LOG_H*0.5);
-
-    // world sınırları (dünya LOG_W/H zaten tek ekran; clamp ile sabitliyoruz)
-    // ileride daha geniş dünya yaparsan burada maxWorldW/H değiştirirsin.
-    const maxX = 0;
-    const maxY = 0;
-    const minX = 0;
-    const minY = 0;
-
-    // yumuşak takip
-    camX += (clamp(targetX, minX, maxX) - camX) * 0.12;
-    camY += (clamp(targetY, minY, maxY) - camY) * 0.12;
-  }
-
   function step(){
     if(!player.alive){
       draw();
@@ -808,7 +782,6 @@
       return;
     }
 
-    // kontrollü fizik
     const speed = 1.85;
     const gravity = 0.31;
     const jumpV = 9.2;
@@ -845,21 +818,13 @@
     collide("y");
 
     interact();
-    updateCamera();
     draw();
     requestAnimationFrame(step);
   }
 
   function draw(){
-    // arkaplan
     drawWallpaper();
 
-    // ✅ kamera: şu an dünya tek ekran olduğu için camX/camY = 0 kalacak,
-    // ama mobilde oyuncuyu yukarı taşımaya yarıyor (tuşlar kapatmasın).
-    ctx.save();
-    ctx.translate(-camX, -camY);
-
-    // tiles
     for(let y=0;y<ROWS;y++){
       for(let x=0;x<COLS;x++){
         const ch = grid[y][x];
@@ -900,7 +865,6 @@
       }
     }
 
-    // player
     const pl = player;
     ctx.fillStyle = "#ffffff";
     ctx.fillRect(pl.x, pl.y, pl.w, pl.h);
@@ -931,13 +895,10 @@
       ctx.fillStyle = "#ffffffcc";
       ctx.fillText("Sıfırla’ya bas (ya da R). Elif’im üzülmesin 🧸💗", 24, 88);
     }
-
-    ctx.restore();
   }
 
-  // init
   loadLevel(0);
-  step();
+  requestAnimationFrame(step);
 })();
 </script>
 </body>
